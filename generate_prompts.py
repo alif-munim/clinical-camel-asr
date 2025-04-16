@@ -71,6 +71,9 @@ def parse_arguments():
     parser.add_argument('--limit', type=int, default=None, 
                         help='Limit number of rows to process (default: all rows)')
     
+    parser.add_argument('--start-row', type=int, default=1,
+                        help='Start processing from this row number in the CSV (default: 1, first data row)')
+    
     parser.add_argument('--api-key', type=str, default=None,
                         help='Directly provide the Anthropic API key (alternative to environment variable)')
     
@@ -102,6 +105,9 @@ def get_column_value(row, possible_names, default=""):
 def main():
     # Parse command line arguments
     args = parse_arguments()
+    
+    # Record the start time for the entire process
+    start_time = datetime.now()
     
     # Check for API key if we're calling the API
     api_key = None
@@ -144,14 +150,32 @@ def main():
         with open(csv_path, 'r') as file:
             csv_reader = csv.DictReader(file)
             header_row = csv_reader.fieldnames
-            csv_rows = list(csv_reader)
+            all_csv_rows = list(csv_reader)
+            
+        total_csv_rows = len(all_csv_rows)
+        print(f"CSV file contains {total_csv_rows} data rows")
+        
+        # Apply start row filter (start_row is 1-indexed for the first data row after header)
+        if args.start_row > 1:
+            start_index = args.start_row - 1  # Convert to 0-indexed
+            if start_index >= total_csv_rows:
+                print(f"ERROR: Start row {args.start_row} exceeds the number of rows in the CSV ({total_csv_rows})")
+                return
+            
+            rows_to_skip = start_index
+            csv_rows = all_csv_rows[start_index:]
+            print(f"Starting from CSV row {args.start_row} (skipping {rows_to_skip} rows)")
+        else:
+            csv_rows = all_csv_rows
         
         # Apply row limit if specified
+        original_row_count = len(csv_rows)
         if args.limit is not None and args.limit > 0:
             csv_rows = csv_rows[:args.limit]
-            print(f"Limited to processing first {args.limit} rows of the CSV file")
+            print(f"Limited to processing {args.limit} rows (out of {original_row_count} remaining rows)")
         
-        print(f"Will process {len(csv_rows)} rows from the CSV file at {csv_path}")
+        rows_to_process = len(csv_rows)
+        print(f"Will process {rows_to_process} rows from the CSV file at {csv_path}")
         print(f"CSV columns found: {header_row}")
     except Exception as e:
         print(f"Error reading CSV file: {e}")
@@ -191,11 +215,21 @@ This distractor should:
 """
     
     # Process each row and generate custom prompts
+    processed_count = 0
+    success_count = 0
+    error_count = 0
+    
     for i, row in enumerate(csv_rows):
-        # Calculate the actual row number (including header row and 0-indexing)
-        row_number = i + 2  # +1 for header row, +1 for human-readable 1-based indexing
+        row_start_time = datetime.now()
         
-        print(f"\nProcessing row {row_number-1}/{len(csv_rows)} (CSV row {row_number})...")
+        # Calculate the actual row number in the original CSV (including header row)
+        csv_row_number = i + args.start_row + 1  # +1 for header row
+        
+        # Calculate progress percentage
+        progress_pct = (i+1) / rows_to_process * 100
+        
+        # Enhanced progress output
+        print(f"\n[{progress_pct:.1f}%] Processing CSV row {csv_row_number}/{total_csv_rows+1} (item {i+1} of {rows_to_process})...")
         
         # Get values using the flexible column mapping
         interaction_type = get_column_value(row, interaction_type_cols, "Initial Consultation")
@@ -235,8 +269,8 @@ This distractor should:
             # Create a generic name if Script Name is empty
             script_name = f"{interaction_type}_{provider_type}_{cancer_type}".replace(" ", "_")
         
-        # Always prepend the row number to the filename
-        prefixed_script_name = f"Row{row_number}_{script_name}"
+        # Always prepend the row number to the filename - use the actual CSV row number
+        prefixed_script_name = f"Row{csv_row_number}_{script_name}"
         
         # Clean the filename to remove any problematic characters
         filename = f"{prefixed_script_name}.txt"
@@ -247,10 +281,13 @@ This distractor should:
             file.write(custom_prompt)
         
         print(f"  Saved prompt to: {prompt_file_path}")
+        processed_count += 1
         
         # Send to Claude API if flag is not set
         if not args.no_api:
             print(f"  Sending prompt to Claude 3.7 Sonnet API...")
+            api_start_time = datetime.now()
+            
             response = call_claude_api(
                 prompt_content=custom_prompt, 
                 api_key=api_key,
@@ -258,9 +295,11 @@ This distractor should:
                 retry_delay=args.retry_delay
             )
             
+            api_duration = (datetime.now() - api_start_time).total_seconds()
+            
             # Save Claude's response - also with row number prefix
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            response_filename = f"Row{row_number}_{script_name}_response_{timestamp}.txt"
+            response_filename = f"Row{csv_row_number}_{script_name}_response_{timestamp}.txt"
             response_filename = response_filename.replace("/", "_").replace("\\", "_").replace(":", "_")
             response_file_path = os.path.join(dialogue_results_dir, response_filename)
             
@@ -270,21 +309,42 @@ This distractor should:
             # Check if the response was an error
             if response.startswith("Error:"):
                 print(f"  WARNING: Received error response. Check {response_file_path} for details.")
+                print(f"  API call took {api_duration:.1f} seconds but failed.")
+                error_count += 1
             else:
                 print(f"  Successfully saved Claude's response to: {response_file_path}")
+                print(f"  API call completed in {api_duration:.1f} seconds.")
+                success_count += 1
             
             # Add a larger delay to avoid hitting rate limits
             if i < len(csv_rows) - 1:
                 delay = 5  # Increased from 2 seconds to 5 seconds
                 print(f"  Waiting {delay} seconds before next request...")
                 time.sleep(delay)
+        
+        # Show timing for this row
+        row_duration = (datetime.now() - row_start_time).total_seconds()
+        print(f"  Row {csv_row_number} completed in {row_duration:.1f} seconds.")
     
-    print(f"\nSummary: Processed {len(csv_rows)} rows from CSV.")
-    if args.no_api:
-        print(f"All prompts have been generated in the {output_dir}/ directory!")
-    else:
-        print(f"All prompts have been generated in the {output_dir}/ directory!")
-        print(f"All dialogue responses have been saved to the {dialogue_results_dir}/ directory!")
+    # Calculate total elapsed time
+    total_duration = (datetime.now() - start_time).total_seconds()
+    minutes, seconds = divmod(total_duration, 60)
+    hours, minutes = divmod(minutes, 60)
+    
+    # Final summary
+    print(f"\n=== PROCESSING COMPLETE ===")
+    print(f"Start row: {args.start_row}")
+    if args.limit:
+        print(f"Limit: {args.limit} rows")
+    print(f"Total rows processed: {processed_count}")
+    if not args.no_api:
+        print(f"Successful API calls: {success_count}")
+        print(f"Failed API calls: {error_count}")
+    print(f"Total processing time: {int(hours)}h {int(minutes)}m {seconds:.1f}s")
+    
+    print(f"\nPrompts saved to: {output_dir}/")
+    if not args.no_api:
+        print(f"Responses saved to: {dialogue_results_dir}/")
 
 if __name__ == "__main__":
     main()

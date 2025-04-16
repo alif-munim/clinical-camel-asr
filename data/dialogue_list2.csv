@@ -1,0 +1,13 @@
+Interaction Type,Provider Type,Cancer Type,Approx visit length (min),Distraction added to script?,Script Name
+New Patient,Medical Oncology,Breast Cancer,45,,1 - New Patient - Medical Oncology - Script
+New Patient,Radiation Oncology,Lung Cancer,45,,3 - New Patient - Radiation Oncology - Script
+Treatment Visit - continue current treatment,Medical Oncology,Prostate Cancer,30,,4 - Treatment Visit - continue current treatment - Medical Oncology - Script
+Treatment Visit - continue current treatment,Surgical Oncology,Colorectal Cancer,30,,5 - Treatment Visit - continue current treatment - Surgical Oncology - Script
+Treatment Visit - change treatment - toxicity,Radiation Oncology,Skin Cancer (including Melanoma) – Often caused by UV exposure.,20,,9 - Treatment Visit - change treatment - toxicity - Radiation Oncology - Script
+Treatment Visit - change treatment - progressive disease,Radiation Oncology,Bladder Cancer – More common in men; can cause blood in the urine.,30,,12 - Treatment Visit - change treatment - progressive disease - Radiation Oncology - Script
+Infusion encounter,Infusion Nurse,Non-Hodgkin Lymphoma,20,"weather, sports",13 - Infusion encounter - Infusion Nurse - Script
+Radiation encounter,Radiation Therapist,Leukemia ,15,,15 - Radiation encounter - Radiation Therapist - Script
+Follow up post medical Oncology therapy - treatment complete & transition to survivorship care,Medical Oncology,Pancreatic Cancer,20,,17 - Follow up post medical Oncology therapy - treatment complete & transition to survivorship care - Medical Oncology - Script
+Suspected recurrence of disease,Radiation Oncology,Kidney (Renal) Cancer,25,,19 - Suspected recurrence of disease - Radiation Oncology - Script
+Patient Education for med Oncology patient,Pharmacist,Liver Cancer,10,,21 - Patient Education for med Oncology patient - Pharmacist - Script
+Patient Navigator interaction,Patient navigator,Ovarian Cancer,25,,23 - Patient Navigator interaction - Patient navigator - Script

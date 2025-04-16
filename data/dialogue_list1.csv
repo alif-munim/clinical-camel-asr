@@ -1,0 +1,13 @@
+Interaction Type,Provider Type,Cancer Type,Approx visit length (min),Distraction added to script?,Script Name
+New Patient,Surgical Onc,"Breast Cancer – Most common in women, but can also occur in men.",45,,2 - New Patient - Surgical Onc - Script
+Treatment Visit - continue current treatment,Radiation Onc,"Lung Cancer – Often linked to smoking, but non-smokers can get it too.",30,,6 - Treatment Visit - continue current treatment - Radiation Onc - Script
+Treatment Visit - change treatment - toxicity,Medical Onc,"Prostate Cancer – A common cancer in men, especially older men.",20,,7 - Treatment Visit - change treatment - toxicity - Medical Onc - Script
+Treatment Visit - change treatment - toxicity,Surgical Onc,Colorectal Cancer – Cancer of the colon or rectum.,20,,8 - Treatment Visit - change treatment - toxicity - Surgical Onc - Script
+Treatment Visit - change treatment - progressive disease,Medical Onc,Skin Cancer (including Melanoma) – Often caused by UV exposure.,30,,10 - Treatment Visit - change treatment - progressive disease - Medical Onc - Script
+Treatment Visit - change treatment - progressive disease,Surgical Onc,Bladder Cancer – More common in men; can cause blood in the urine.,30,,11 - Treatment Visit - change treatment - progressive disease - Surgical Onc - Script
+Injection encounter,Nurse ,Non-Hodgkin Lymphoma – A cancer of the lymphatic system.,15,,14 - Injection encounter - Nurse  - Script
+Follow up post radiation therapy - treatment complete & transition to survivorship care,Radiation Onc,Leukemia – Cancer of the blood or bone marrow; includes several subtypes.,20,,16 - Follow up post radiation therapy - treatment complete & transition to survivorship care - Radiation Onc - Script
+Post-op follow up for surgery-only patient,Surgical Onc,Pancreatic Cancer – Often aggressive and detected late.,15,,18 - Post-op follow up for surgery-only patient - Surgical Onc - Script
+Suspected recurrence of disease,Medical Onc,Kidney (Renal) Cancer – Can involve tumors in one or both kidneys.,25,,20 - Suspected recurrence of disease - Medical Onc - Script
+Transition to palliative care,Provider,Liver Cancer – Often linked to hepatitis or cirrhosis.,20,,22 - Transition to palliative care - Provider - Script
+New Patient,Dietitian,Ovarian Cancer – Typically detected in later stages; affects the ovaries.,20,,24 - New Patient - Dietitian - Script

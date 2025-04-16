@@ -77,4 +77,5 @@ generate prompts and send to api
 ```
 python generate_prompts.py --api-key="your-api-key-here" --max-retries=5 --retry-delay=10 --limit=2
 python generate_prompts.py --max-retries=5 --retry-delay=10 --csv-path data/dialogue_list2.csv
+python generate_prompts.py --no-api --csv-path data/dialogue_list2.csv --limit=2
 ```

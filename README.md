@@ -80,3 +80,9 @@ python generate_prompts.py --max-retries=5 --retry-delay=10 --csv-path data/dial
 python generate_prompts.py --no-api --csv-path data/dialogue_list2.csv --limit=2
 python generate_prompts.py --max-retries=5 --retry-delay=10 --csv-path data/dialogue_list3.csv --start-row 6
 ```
+
+update csv
+```
+python update_csv.py --csv-path data/dialogue_list3.csv
+```
+

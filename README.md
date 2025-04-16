@@ -73,3 +73,8 @@ scidata whisper-large-v3
 python distil_whisper_scidata.py --audio_dir "/home/jma/Documents/vita/scidata22-audio/Audio Recordings" --transcript_dir "/home/jma/Documents/vita/scidata22-audio/Clean Transcripts" --output_dir "results" --model_type whisper-large-v3
 ```
 
+generate prompts and send to api
+```
+python generate_prompts.py --api-key="your-api-key-here" --max-retries=5 --retry-delay=10 --limit=2
+python generate_prompts.py --max-retries=5 --retry-delay=10 --csv-path data/dialogue_list2.csv
+```

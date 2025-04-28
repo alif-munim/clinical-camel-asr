@@ -1,15 +1,51 @@
 # clinical-canary
 
-canary
+turbo with VAD
 ```
-python scripts/speech_to_text_aed_chunked_infer.py \
-    pretrained_name="nvidia/canary-1b" \
-    audio_dir="audio/" \
-    output_filename="results/day01_doctor_output.json" \
-    chunk_len_in_secs=40.0 \
-    batch_size=1 \
-    decoding.beam.beam_size=1
+python transcribe_turbo.py --input_dir /home/jma/Documents/clinical-canary/0424_audio_wav --output_dir /home/jma/Documents/clinical-canary/0424_audio_transcripts --use_vad
 ```
+
+postprocess + summarize
+```
+export OPENROUTER_API_KEY=<api-key>
+python postprocess_and_summarize.py \
+  --model deepseek \
+  --input_dir 0424_audio_transcripts \
+  --post_dir 0424_postprocessed_deepseek \
+  --summary_dir 0424_summarized_deepseek \
+  --post_prompt prompts/postprompt_v1.txt \
+  --summary_prompt prompts/summaryprompt_v1.txt \
+  --max_tokens 64000
+```
+
+evaluate single example with openai
+```
+export OPENAI_API_KEY=<api-key>
+python eval_batch.py \
+  --prompt /home/jma/Documents/clinical-canary/prompts/eval_v1.txt \
+  --single-mode \                                                        
+  --transcript "/home/jma/Documents/clinical-canary/0424_audio_transcripts/15 - Radiation encounter - Radiation Therapist - Audio Claude.txt" \                                              
+  --summary "/home/jma/Documents/clinical-canary/0424_summarized_deepseek/15 - Radiation encounter - Radiation Therapist - Audio Claude.sum.txt" \
+  --results-dir /home/jma/Documents/clinical-canary/0424_eval_single_test \
+  --prompts-dir /home/jma/Documents/clinical-canary/0424_eval_prompts \
+  --api-base https://api.openai.com/v1 \
+  --temperature 0
+```
+
+batch evaluate with openai (pass the gt and summary directories)
+```
+export OPENAI_API_KEY=<api-key>
+python eval_batch.py \
+  --prompt /home/jma/Documents/clinical-canary/prompts/eval_v1.txt \
+  --gt-dir "/home/jma/Documents/clinical-canary/0424_audio_transcripts" \
+  --sum-dir "/home/jma/Documents/clinical-canary/0424_summarized_deepseek" \
+  --results-dir /home/jma/Documents/clinical-canary/0424_eval_results \
+  --prompts-dir /home/jma/Documents/clinical-canary/0424_eval_prompts \
+  --api-base https://api.openai.com/v1 \
+  --temperature 0
+```
+
+# Primock 57
 
 whisper
 ```
@@ -58,6 +94,9 @@ python add_audio_lengths.py --csv "distil_whisper_results/wer_results.csv" \
                            --analyze
 ```
 
+
+# SciData 22
+
 scidata distil
 ```
 python distil_whisper_scidata.py --audio_dir "/home/jma/Documents/vita/scidata22-audio/Audio Recordings" --transcript_dir "/home/jma/Documents/vita/scidata22-audio/Clean Transcripts" --output_dir "results"
@@ -78,11 +117,17 @@ generate prompts and send to api
 python generate_prompts.py --api-key="your-api-key-here" --max-retries=5 --retry-delay=10 --limit=2
 python generate_prompts.py --max-retries=5 --retry-delay=10 --csv-path data/dialogue_list2.csv
 python generate_prompts.py --no-api --csv-path data/dialogue_list2.csv --limit=2
-python generate_prompts.py --max-retries=5 --retry-delay=10 --csv-path data/dialogue_list3.csv --start-row 6
 ```
 
-update csv
-```
-python update_csv.py --csv-path data/dialogue_list3.csv
-```
+# NVidia Canary
 
+canary
+```
+python scripts/speech_to_text_aed_chunked_infer.py \
+    pretrained_name="nvidia/canary-1b" \
+    audio_dir="audio/" \
+    output_filename="results/day01_doctor_output.json" \
+    chunk_len_in_secs=40.0 \
+    batch_size=1 \
+    decoding.beam.beam_size=1
+```

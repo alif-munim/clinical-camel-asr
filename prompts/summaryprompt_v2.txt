@@ -1,0 +1,174 @@
+From the doctor-patient dialogue transcription above, conduct a thorough medical data extraction following these guidelines:
+
+1. OUTPUT FORMAT:
+- Return a single, well-formed JSON object matching exactly the structure below
+- Use ONLY the specified category names and field names
+- Maintain original field ordering within categories
+- Include ALL available data points that fit the categories below
+- Omit completely empty categories
+
+2. DATA EXTRACTION RULES:
+- Extract ALL clinically relevant information with maximum granularity
+- For fields with narrative sections: Include complete symptom descriptions with durations, temporal patterns, and qualifiers
+- For history items: Capture complete historical context including timeframes
+- For physical exam findings: Note laterality, severity descriptors, and provocation factors when mentioned
+- For medications: Include dosage frequency even if specific drug name is unknown
+- For symptoms: Capture both presence and absence as documented
+- For diagnostic workup: Detail all planned procedures with their purposes
+- For treatment discussions: Capture all modalities mentioned (even potential future ones)
+
+3. CLINICAL INTERPRETATION:
+- Convert all clinical terminology to standardized medical phrasing
+- Expand all abbreviations
+- For chronological data: Explicitly note if exact dates are unavailable
+- For staging/grading: Specify "not yet staged" when workup is incomplete
+- For pending items: Clearly mark as "pending" or "to be scheduled"
+- Where exact values aren't stated but implied: Document the implication (e.g., "controlled" for conditions)
+
+4. OUTPUT CONSTRAINTS:
+- Absolutely no additional commentary or Markdown
+- No empty brackets or placeholder text
+- No truncated information - include complete clinical descriptions
+- Escape only characters that violate JSON formatting rules
+- String values must be exact clinical representations (no paraphrasing)
+
+5. CATEGORIES & FIELDS: CATEGORIES & FIELDS
+───────────────────
+
+PATIENT DEMOGRAPHICS  
+Patient Name  
+Date of Birth/Age  
+Ethnicity  
+Race  
+Occupation Status  
+Insurance Provider(s)  
+Preferred Language  
+
+VITALS  
+Current Vitals  
+Weight  
+Height  
+BSA  
+BP  
+Pulse Rate  
+Respiration Rate  
+O2 Saturation  
+Temperature  
+BMI  
+
+PATIENT HISTORY  
+Family History  
+HPI ‑ Summary  
+Social Lifestyle  
+Chief Complaint  
+Most Recent MAR with Verification & Pharmacy Waste [latest MAR showing double‑check and drug‑waste documentation]  
+Most Recent MAR with Waste [latest MAR that documents discarded or returned meds]  
+Orders on Physician’s Last Visit Date [all orders placed at the most recent physician encounter]  
+Most Recent MAR [most current medication administration record]  
+HPI ‑ Tx History [prior treatments—drugs, radiation, surgery—and outcomes]  
+Social History  
+HPI ‑ Imaging [key imaging studies (CT, MRI, X‑ray) with dates and findings]  
+HPI ‑ Surgery [past surgeries relevant to current illness]  
+Lives With  
+Lives In  
+Immunizations  
+Advance Directives [documents such as DNR, living will, POA]  
+Family Hx ‑ Genes [hereditary pathogenic variants in the family]  
+Family Hx ‑ Tumor Markers [cancer biomarkers noted in relatives]  
+HPI ‑ Labs [key laboratory results discussed in HPI]  
+Support System  
+Adequate Transportation [patient’s ability to travel reliably for care]  
+Religion  
+HPI ‑ History  
+
+ALLERGIES  
+Allergies  
+
+COMORBIDITIES & PROBLEMS  
+Comorbidities  
+Problems  
+
+DIAGNOSIS  
+Current Diagnosis  
+Diagnosis Summary  
+Current Diagnosis ‑ Stage [disease stage such as TNM or clinical stage]  
+Primary Diagnosis  
+Secondary Diagnosis  
+Current Diagnosis ‑ Histology [tissue type on pathology]  
+Current Diagnosis ‑ Clinical Desc. [text description of lesion size, spread, symptoms]  
+
+GENOMIC ALTERATIONS  
+Genomics Results [molecular or genetic test findings]  
+
+TUMOR PROFILE  
+Tumor Profile [aggregated data on tumor type, stage, biomarkers]  
+
+CURRENT MEDICATIONS  
+Active Medications  
+Treatment Drugs/Meds  
+Inactive Drugs  
+
+RADIATION  
+Radiation ‑ Treatment Weekly Summary [weekly note on radiation dose, fields, tolerance]  
+
+PHYSICAL EXAM  
+Most Recent PE Normal (Paragraph) [narrative of normal findings]  
+Most Recent PE Abnormal (Paragraph) [narrative of abnormal findings]  
+Most Recent PE Header Comment [clinician’s summary header]  
+Most Recent PE Normal (List) [bullet list of normal findings]  
+Most Recent PE Abnormal (List) [bullet list of abnormal findings]  
+
+REVIEW OF SYSTEMS  
+Most Recent ROS Denied (Paragraph) [paragraph of symptoms the patient denied]  
+Most Recent ROS Reported (Paragraph) [paragraph of symptoms the patient reported]  
+Most Recent ROS Header Comment [ROS section summary]  
+Most Recent ROS Reported (List) [list of positive symptoms]  
+Most Recent ROS Denied (List) [list of negative symptoms]  
+
+LAB TESTS  
+Most Recent Labs  
+
+ASSESSMENTS  
+Pain Assessment  
+Patient Procedures  
+ECOG  
+Venous Access Device  
+Peripheral IV  
+Most Recent Toxicities  
+Most Recent Toxicities (Grade & Description Only)  
+Karnofsky  
+Health Maintenance  
+Today’s Labs  
+Injection  
+Patient Education  
+PIV assessment  
+Injection‑Draws  
+Infusion Assessment  
+Injection Assessment  
+Therapeutic Phlebotomy  
+Most Recent Toxicities (Include Not Documented)  
+Transitional Care Contract  
+
+PLAN DATA  
+Date of Service  
+Plan Dictation  
+Impression Dictation  
+Plan Name (Last Modified Plan)  
+Current Cycle Day (Last Modified Plan) [day number within active treatment cycle]  
+Current Cycle Number (Last Modified Plan) [cycle sequence number]  
+Next Scheduled Appointment Date  
+Visit Provider  
+Treatment Plan(s) Active  
+Line of Therapy (Last Modified Plan) [line of therapy for latest plan]
+
+Provide the JSON extraction with these strict modifications:
+- Include BOTH paragraph AND list formats for all ROS/PE fields where applicable
+- For historical data: Always include duration/date context
+- For physical findings: Include anatomical specificity
+- For treatment plans: Break multi-step plans into discrete components
+- Never collapse related data points - represent each distinctly
+- For negative findings: Explicitly document as "Denies [symptom]"
+- For medications: Include frequency and route when known
+- For symptoms: Preserve all descriptive qualifiers (e.g., "intermittent", "worsening")
+
+Provide the JSON summary for the ENTIRE processed conversation.

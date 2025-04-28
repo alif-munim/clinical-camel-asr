@@ -1,0 +1,151 @@
+Great. From the doctor‑patient dialogue transcription above, extract only the data elements listed under “CATEGORIES & FIELDS” and return a single, well‑formed JSON object.
+JSON format  
+{{
+  "Category Name": {{
+    "Field Name": "value",
+    …
+  }},
+  …
+}}
+
+Rules  
+1. Keep category names and field names exactly as written below.  
+2. For every field you capture, add a "Field Name": "value" pair inside its category object.  
+3. Keep the original field order within each category; JSON objects preserve insertion order.  
+4. Omit any field that is not mentioned; omit any category that ends up empty.  
+5. All string values must be plain text (no escape characters except what JSON requires).  
+6. If the transcription contains no clinically meaningful content, output exactly:
+   {{"message":"no meaningful information"}}  
+7. Do **not** output any text, comments, Markdown, or square‑bracket explanations—only the JSON.  
+8. Ignore everything in [square brackets]; it is guidance for you, not part of the output.
+
+CATEGORIES & FIELDS
+───────────────────
+
+PATIENT DEMOGRAPHICS  
+Patient Name  
+Date of Birth/Age  
+Ethnicity  
+Race  
+Occupation Status  
+Insurance Provider(s)  
+Preferred Language  
+
+VITALS  
+Current Vitals  
+Weight  
+Height  
+BSA  
+BP  
+Pulse Rate  
+Respiration Rate  
+O2 Saturation  
+Temperature  
+BMI  
+
+PATIENT HISTORY  
+Family History  
+HPI ‑ Summary  
+Social Lifestyle  
+Chief Complaint  
+Most Recent MAR with Verification & Pharmacy Waste [latest MAR showing double‑check and drug‑waste documentation]  
+Most Recent MAR with Waste [latest MAR that documents discarded or returned meds]  
+Orders on Physician’s Last Visit Date [all orders placed at the most recent physician encounter]  
+Most Recent MAR [most current medication administration record]  
+HPI ‑ Tx History [prior treatments—drugs, radiation, surgery—and outcomes]  
+Social History  
+HPI ‑ Imaging [key imaging studies (CT, MRI, X‑ray) with dates and findings]  
+HPI ‑ Surgery [past surgeries relevant to current illness]  
+Lives With  
+Lives In  
+Immunizations  
+Advance Directives [documents such as DNR, living will, POA]  
+Family Hx ‑ Genes [hereditary pathogenic variants in the family]  
+Family Hx ‑ Tumor Markers [cancer biomarkers noted in relatives]  
+HPI ‑ Labs [key laboratory results discussed in HPI]  
+Support System  
+Adequate Transportation [patient’s ability to travel reliably for care]  
+Religion  
+HPI ‑ History  
+
+ALLERGIES  
+Allergies  
+
+COMORBIDITIES & PROBLEMS  
+Comorbidities  
+Problems  
+
+DIAGNOSIS  
+Current Diagnosis  
+Diagnosis Summary  
+Current Diagnosis ‑ Stage [disease stage such as TNM or clinical stage]  
+Primary Diagnosis  
+Secondary Diagnosis  
+Current Diagnosis ‑ Histology [tissue type on pathology]  
+Current Diagnosis ‑ Clinical Desc. [text description of lesion size, spread, symptoms]  
+
+GENOMIC ALTERATIONS  
+Genomics Results [molecular or genetic test findings]  
+
+TUMOR PROFILE  
+Tumor Profile [aggregated data on tumor type, stage, biomarkers]  
+
+CURRENT MEDICATIONS  
+Active Medications  
+Treatment Drugs/Meds  
+Inactive Drugs  
+
+RADIATION  
+Radiation ‑ Treatment Weekly Summary [weekly note on radiation dose, fields, tolerance]  
+
+PHYSICAL EXAM  
+Most Recent PE Normal (Paragraph) [narrative of normal findings]  
+Most Recent PE Abnormal (Paragraph) [narrative of abnormal findings]  
+Most Recent PE Header Comment [clinician’s summary header]  
+Most Recent PE Normal (List) [bullet list of normal findings]  
+Most Recent PE Abnormal (List) [bullet list of abnormal findings]  
+
+REVIEW OF SYSTEMS  
+Most Recent ROS Denied (Paragraph) [paragraph of symptoms the patient denied]  
+Most Recent ROS Reported (Paragraph) [paragraph of symptoms the patient reported]  
+Most Recent ROS Header Comment [ROS section summary]  
+Most Recent ROS Reported (List) [list of positive symptoms]  
+Most Recent ROS Denied (List) [list of negative symptoms]  
+
+LAB TESTS  
+Most Recent Labs  
+
+ASSESSMENTS  
+Pain Assessment  
+Patient Procedures  
+ECOG  
+Venous Access Device  
+Peripheral IV  
+Most Recent Toxicities  
+Most Recent Toxicities (Grade & Description Only)  
+Karnofsky  
+Health Maintenance  
+Today’s Labs  
+Injection  
+Patient Education  
+PIV assessment  
+Injection‑Draws  
+Infusion Assessment  
+Injection Assessment  
+Therapeutic Phlebotomy  
+Most Recent Toxicities (Include Not Documented)  
+Transitional Care Contract  
+
+PLAN DATA  
+Date of Service  
+Plan Dictation  
+Impression Dictation  
+Plan Name (Last Modified Plan)  
+Current Cycle Day (Last Modified Plan) [day number within active treatment cycle]  
+Current Cycle Number (Last Modified Plan) [cycle sequence number]  
+Next Scheduled Appointment Date  
+Visit Provider  
+Treatment Plan(s) Active  
+Line of Therapy (Last Modified Plan) [line of therapy for latest plan]
+
+Provide the JSON summary for the ENTIRE processed conversation.

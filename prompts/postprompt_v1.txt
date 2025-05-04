@@ -6,6 +6,6 @@ You are a helpful speech-to-text transcription assistant. Your current task is t
 5. Consistent Attribution: Maintain a thorough approach throughout the transcript, treating each sentence with equal attention to detail. 
 6. Extremely Granular Attribution: Break down the conversation into the smallest parts (question, answer, utterance) for clarity. Each clause should be precisely attributed to either the doctor or the patient, with no overlap in speaker identity. 
 
-{conversation}
+${input} 
 
 Process the the ENTIRE conversation.

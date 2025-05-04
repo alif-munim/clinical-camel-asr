@@ -13,11 +13,12 @@ from openai import OpenAI, OpenAIError          # pip install openai==1.*
 from rich.progress import Progress             # pip install rich
 from string import Template
 
+
 # ------------------------ model map ------------------------
 MODEL_ALIASES: Dict[str, str] = {
     "qwen-72b":  "qwen/qwen-2.5-72b-instruct",
-    "qwq-32b":   "qwq/qwq-32b",
-    "gemma-27b": "google/gemma-3b-27b-instruct",
+    "qwq-32b":   "qwen/qwq-32b",
+    "gemma-27b": "google/gemma-3-27b-it",
     "deepseek":  "deepseek/deepseek-chat-v3-0324"
 }
 # -----------------------------------------------------------
@@ -105,7 +106,7 @@ def main() -> None:
             raw = fpath.read_text(encoding="utf-8")
             # 1️⃣ post-processing
             pprompt = render(post_tmpl, raw)
-            print("TOKENS IN:", tokenize_len(pprompt))
+            # print("TOKENS IN:", tokenize_len(pprompt))
             print("DEBUG prompt starts >>>", pprompt[:400], "<<<")
             print("DEBUG prompt ends >>>", pprompt[400:], "<<<")
             processed = call_llm(client, model_slug, pprompt,

@@ -1,5 +1,51 @@
 # clinical-canary
 
+
+## Quickstart on Workstation
+
+Set up your environment and API keys.
+```
+conda activate clinical_canary
+export OPENROUTER_API_KEY=<api-key>
+export OPENAI_API_KEY=<api-key>
+```
+
+Transcribe all of your audio files.
+```
+python transcribe_turbo.py --input_dir /home/jma/Documents/clinical-canary/0424_audio_wav --output_dir /home/jma/Documents/clinical-canary/0424_audio_transcripts --use_vad
+```
+
+Postprocess and summarize with the model of your choice.
+```
+export RUN_DATE=0504 # or whatever identifier you want to use
+export RUN_MODEL=gemma-27b # other options are deepseek, qwq-32b, and qwen-72b
+python postprocess_and_summarize.py \
+  --model        "$RUN_MODEL" \
+  --input_dir    "${RUN_DATE}_audio_transcripts" \
+  --post_dir     "${RUN_DATE}_postprocessed_${RUN_MODEL}" \
+  --summary_dir  "${RUN_DATE}_summarized_${RUN_MODEL}" \
+  --post_prompt prompts/postprompt_v1.txt \
+  --summary_prompt prompts/summaryprompt_v1.txt \
+  --max_tokens 64000
+```
+
+Evaluate all of your summaries against ground truth transcripts.
+```
+ROOT=/home/jma/Documents/clinical-canary
+python eval_batch.py \
+  --prompt       "$ROOT/prompts/eval_v1.txt" \
+  --gt-dir       "$ROOT/${RUN_DATE}_audio_transcripts" \
+  --sum-dir      "$ROOT/${RUN_DATE}_summarized_${RUN_MODEL}" \
+  --results-dir  "$ROOT/${RUN_DATE}_eval_results_${RUN_MODEL}" \
+  --prompts-dir  "$ROOT/${RUN_DATE}_eval_prompts_${RUN_MODEL}" \
+  --api-base     "https://api.openai.com/v1" \
+  --temperature  0
+```
+
+
+
+## Misc
+
 turbo with VAD
 ```
 python transcribe_turbo.py --input_dir /home/jma/Documents/clinical-canary/0424_audio_wav --output_dir /home/jma/Documents/clinical-canary/0424_audio_transcripts --use_vad
@@ -8,11 +54,13 @@ python transcribe_turbo.py --input_dir /home/jma/Documents/clinical-canary/0424_
 postprocess + summarize
 ```
 export OPENROUTER_API_KEY=<api-key>
+export RUN_DATE=0504  
+export RUN_MODEL=gemma-27b
 python postprocess_and_summarize.py \
-  --model deepseek \
-  --input_dir 0424_audio_transcripts \
-  --post_dir 0424_postprocessed_deepseek \
-  --summary_dir 0424_summarized_deepseek \
+  --model        "$RUN_MODEL" \
+  --input_dir    "${RUN_DATE}_audio_transcripts" \
+  --post_dir     "${RUN_DATE}_postprocessed_${RUN_MODEL}" \
+  --summary_dir  "${RUN_DATE}_summarized_${RUN_MODEL}" \
   --post_prompt prompts/postprompt_v1.txt \
   --summary_prompt prompts/summaryprompt_v1.txt \
   --max_tokens 64000
@@ -35,14 +83,17 @@ python eval_batch.py \
 batch evaluate with openai (pass the gt and summary directories)
 ```
 export OPENAI_API_KEY=<api-key>
+export RUN_DATE=0504          
+export RUN_MODEL=gemma-27b
+ROOT=/home/jma/Documents/clinical-canary
 python eval_batch.py \
-  --prompt /home/jma/Documents/clinical-canary/prompts/eval_v1.txt \
-  --gt-dir "/home/jma/Documents/clinical-canary/0424_audio_transcripts" \
-  --sum-dir "/home/jma/Documents/clinical-canary/0424_summarized_deepseek" \
-  --results-dir /home/jma/Documents/clinical-canary/0424_eval_results \
-  --prompts-dir /home/jma/Documents/clinical-canary/0424_eval_prompts \
-  --api-base https://api.openai.com/v1 \
-  --temperature 0
+  --prompt       "$ROOT/prompts/eval_v1.txt" \
+  --gt-dir       "$ROOT/${RUN_DATE}_audio_transcripts" \
+  --sum-dir      "$ROOT/${RUN_DATE}_summarized_${RUN_MODEL}" \
+  --results-dir  "$ROOT/${RUN_DATE}_eval_results_${RUN_MODEL}" \
+  --prompts-dir  "$ROOT/${RUN_DATE}_eval_prompts_${RUN_MODEL}" \
+  --api-base     "https://api.openai.com/v1" \
+  --temperature  0
 ```
 
 # Primock 57

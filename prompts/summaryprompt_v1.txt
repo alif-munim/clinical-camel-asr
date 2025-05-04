@@ -148,4 +148,6 @@ Visit Provider
 Treatment Plan(s) Active  
 Line of Therapy (Last Modified Plan) [line of therapy for latest plan]
 
+${input} 
+
 Provide the JSON summary for the ENTIRE processed conversation.

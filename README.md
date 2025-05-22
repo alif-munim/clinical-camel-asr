@@ -42,7 +42,22 @@ python eval_batch.py \
   --temperature  0
 ```
 
+## HuggingFace
 
+```
+export RUN_DATE=0504 # or whatever identifier you want to use
+export RUN_MODEL=medgemma-27b 
+python postprocess_and_summarize_hf.py \
+  --or_model qwen3-32b \
+  --hf_model medgemma-27b \
+  --input_dir  "${RUN_DATE}_audio_transcripts" \
+  --post_dir   "${RUN_DATE}_postprocessed_qwen32b" \
+  --summary_dir "${RUN_DATE}_summarized_medgemma27b" \
+  --post_prompt    prompts/postprompt_v1.txt \
+  --summary_prompt prompts/summaryprompt_v1.txt \
+  --max_tokens 8192 \
+  --temperature 0
+```
 
 ## Misc
 

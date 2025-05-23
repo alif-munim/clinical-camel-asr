@@ -1,14 +1,27 @@
 #!/usr/bin/env python3
 """
-postprocess_or_then_summarize_hf.py
+postprocess_then_summarize.py
 ────────────────────────────────────────────────────────────
-• Step 1  (post-process)  : OpenRouter chat completion
-• Step 2  (summarise)     : local Hugging Face model
+Default:            both post-processing *and* summarisation are done
+                    with one local Hugging Face model.
 
-Safety guards:
-  – prompt-truncation so prompt + gen ≤ context (HF side)
-  – deterministic decoding by default (temperature 0)
-  – selectable dtype (auto / fp16 / bf16 / fp32)
+Optional:           supply --or_model to run post-processing on OpenRouter
+                    and keep summarisation local.
+
+Flags
+─────
+    --skip_post     Skip Step 1 entirely.  Assumes *.post.txt exist in
+                    --post_dir and generates summaries only.
+
+    --or_model      OpenRouter model slug for Step 1.  If omitted, the HF
+                    model is used for Step 1 as well.
+
+Other features
+──────────────
+  – Prompt truncation so prompt + gen ≤ model context
+  – Deterministic decoding by default (temperature 0)
+  – Selectable dtype (auto / fp16 / bf16 / fp32)
+  – SDPA flash/mem-efficient kernels disabled (Gemma CUDA bug)
 
 © 2025 – MIT License
 """
@@ -22,9 +35,9 @@ import torch
 
 torch.backends.cuda.enable_flash_sdp(False)
 torch.backends.cuda.enable_mem_efficient_sdp(False)
-torch.backends.cuda.enable_math_sdp(True)   # make sure a kernel is enabled
+torch.backends.cuda.enable_math_sdp(True)
 
-from openai import OpenAI, OpenAIError         # pip install openai==1.*
+from openai import OpenAI, OpenAIError           # pip install openai==1.*
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -35,110 +48,70 @@ from huggingface_hub import snapshot_download
 from rich.progress import Progress
 
 
-# ╭──────────────────────────── Model maps ───────────────────────────╮
-OR_MODELS: Dict[str, str] = {   # OpenRouter slugs
-    "qwen2.5-72b":  "qwen/qwen-2.5-72b-instruct",
-    "qwen3-8b": "qwen/qwen3-8b",
-    "qwen3-14b": "qwen/qwen3-14b",
-    "qwen3-32b": "qwen/qwen3-32b",
-    "qwen3-a3b": "qwen/qwen3-30b-a3b",
-    "qwq-32b":   "qwen/qwq-32b",
-    "gemma-27b": "google/gemma-3-27b-it",
-    "deepseek":  "deepseek/deepseek-chat-v3-0324"
+# ╭────────────────────────── model maps ──────────────────────────╮
+OR_MODELS: Dict[str, str] = {
+    "qwen2.5-72b": "qwen/qwen-2.5-72b-instruct",
+    "qwen3-8b":    "qwen/qwen3-8b",
+    "qwen3-14b":   "qwen/qwen3-14b",
+    "qwen3-32b":   "qwen/qwen3-32b",
+    "qwen3-a3b":   "qwen/qwen3-30b-a3b",
+    "qwq-32b":     "qwen/qwq-32b",
+    "gemma-27b":   "google/gemma-3-27b-it",
+    "deepseek":    "deepseek/deepseek-chat-v3-0324",
 }
-HF_MODELS: Dict[str, str] = {   # summarisation (local)
+HF_MODELS: Dict[str, str] = {
     "medgemma-27b": "google/medgemma-27b-text-it",
+    "medgemma-4b":  "google/medgemma-4b-it",
 }
-HF_CTX: Dict[str, int] = {      # context length
-    "medgemma-27b": 8192,
-}
-# ╰───────────────────────────────────────────────────────────────────╯
+HF_CTX: Dict[str, int] = {m: 8192 for m in HF_MODELS}  # same ctx for both
+# ╰───────────────────────────────────────────────────────────────╯
 
-# cache for HF pipeline
-_PIPELINE: TextGenerationPipeline | None = None
-_LOADED_REPO: str | None = None
+_PIPE: TextGenerationPipeline | None = None
+_PIPE_REPO: str | None = None
 
 
-def _select_dtype(desired: Literal["auto", "fp16", "bf16", "fp32"], gpu: bool) -> torch.dtype:
-    if desired == "fp32":
+def _select_dtype(kind: Literal["auto", "fp16", "bf16", "fp32"], gpu: bool) -> torch.dtype:
+    if kind == "fp32":
         return torch.float32
-    if desired == "bf16":
+    if kind == "bf16":
         return torch.bfloat16
-    if desired == "fp16":
+    if kind == "fp16":
         return torch.float16
     return torch.bfloat16 if gpu and torch.cuda.is_bf16_supported() else (
         torch.float16 if gpu else torch.float32
     )
 
 
-# ───────────────────────────── OpenRouter helpers ─────────────────────────────
-def get_or_client(api_key: str, referrer: str = "https://example.com",
-                  title: str = "postprocess-script") -> OpenAI:
-    return OpenAI(
-        api_key=api_key,
-        base_url="https://openrouter.ai/api/v1",
-        default_headers={"HTTP-Referer": referrer, "X-Title": title},
-        timeout=120,
-    )
+# ───────────────────────────── Hugging Face ─────────────────────────────
+def get_hf_pipeline(repo_id: str, dtype_choice: str) -> TextGenerationPipeline:
+    global _PIPE, _PIPE_REPO
+    if _PIPE and _PIPE_REPO == repo_id:
+        return _PIPE
 
-
-def call_or(model: str, prompt: str, max_tokens: int,
-            temperature: float, retries: int = 3, backoff: float = 2.0) -> str:
-    key = os.getenv("OPENROUTER_API_KEY")
-    if not key:
-        sys.exit("Error: set OPENROUTER_API_KEY")
-    client = get_or_client(key)
-    err: Exception | None = None
-    for attempt in range(retries + 1):
-        try:
-            resp = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
-                temperature=temperature,
-            )
-            return resp.choices[0].message.content.strip()
-        except OpenAIError as e:
-            err = e
-            if attempt == retries:
-                raise
-            time.sleep(backoff ** attempt)
-    raise err  # unreachable
-# ───────────────────────────────────────────────────────────────────────────────
-
-
-# ───────────────────────────── HuggingFace helpers ────────────────────────────
-def get_hf_pipeline(repo_id: str, *, dtype_choice: str, token: str | None) -> TextGenerationPipeline:
-    global _PIPELINE, _LOADED_REPO
-    if _PIPELINE and _LOADED_REPO == repo_id:
-        return _PIPELINE
-
-    local_dir = snapshot_download(repo_id, resume_download=True, token=token)
+    local = snapshot_download(repo_id, resume_download=True,
+                              token=os.getenv("HUGGINGFACE_HUB_TOKEN"))
     gpu = torch.cuda.is_available()
     dtype = _select_dtype(dtype_choice, gpu)
 
     model = AutoModelForCausalLM.from_pretrained(
-        local_dir,
-        torch_dtype=dtype,
-        device_map="auto" if gpu else None,
+        local, torch_dtype=dtype, device_map="auto" if gpu else None
     )
-    tok = AutoTokenizer.from_pretrained(local_dir)
-    _PIPELINE = TextGenerationPipeline(model=model, tokenizer=tok)
-    _LOADED_REPO = repo_id
-    return _PIPELINE
+    tok = AutoTokenizer.from_pretrained(local)
+    _PIPE = TextGenerationPipeline(model=model, tokenizer=tok)
+    _PIPE_REPO = repo_id
+    return _PIPE
 
 
 def hf_generate(pipe: TextGenerationPipeline, prompt: str, *,
                 max_tokens: int, temperature: float, ctx_limit: int,
                 retries: int = 3, backoff: float = 2.0) -> str:
-    # trim prompt to fit context
     ids = pipe.tokenizer(prompt, return_tensors="pt",
                          add_special_tokens=False).input_ids[0]
     if ids.numel() + max_tokens > ctx_limit:
-        keep = ctx_limit - max_tokens
-        prompt = pipe.tokenizer.decode(ids[-keep:], skip_special_tokens=False)
+        prompt = pipe.tokenizer.decode(ids[-(ctx_limit - max_tokens):],
+                                       skip_special_tokens=False)
 
-    gen_cfg = GenerationConfig(
+    cfg = GenerationConfig(
         max_new_tokens=max_tokens,
         do_sample=temperature > 0,
         temperature=temperature if temperature > 0 else None,
@@ -148,26 +121,59 @@ def hf_generate(pipe: TextGenerationPipeline, prompt: str, *,
 
     for attempt in range(retries + 1):
         try:
-            out = pipe(prompt, generation_config=gen_cfg, return_full_text=False)[0]["generated_text"]
-            return out.strip()
+            txt = pipe(prompt, generation_config=cfg,
+                       return_full_text=False)[0]["generated_text"]
+            return txt.strip()
         except Exception:
             if attempt == retries:
                 raise
             time.sleep(backoff ** attempt)
-# ───────────────────────────────────────────────────────────────────────────────
+
+
+# ───────────────────────────── OpenRouter ─────────────────────────────
+def get_or_client() -> OpenAI:
+    key = os.getenv("OPENROUTER_API_KEY")
+    if not key:
+        sys.exit("OPENROUTER_API_KEY missing")
+    return OpenAI(
+        api_key=key,
+        base_url="https://openrouter.ai/api/v1",
+        default_headers={"HTTP-Referer": "https://example.com", "X-Title": "postprocess-script"},
+        timeout=120,
+    )
+
+
+def or_generate(model: str, prompt: str, *,
+                max_tokens: int, temperature: float,
+                retries: int = 3, backoff: float = 2.0) -> str:
+    client = get_or_client()
+    for attempt in range(retries + 1):
+        try:
+            r = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=max_tokens,
+                temperature=temperature,
+            )
+            return r.choices[0].message.content.strip()
+        except OpenAIError:
+            if attempt == retries:
+                raise
+            time.sleep(backoff ** attempt)
+# ────────────────────────────────────────────────────────────────────────
 
 
 def render(tmpl: str, text: str) -> str:
     return Template(tmpl).safe_substitute(input=text)
 
 
-# ───────────────────────────────────────── main ───────────────────────────────
+# ───────────────────────────────────────── main ──────────────────────────────
 def main() -> None:
-    ap = argparse.ArgumentParser("Post-process with OpenRouter, summarise with local HF")
-    ap.add_argument("--or_model", required=True, choices=OR_MODELS.keys(),
-                    help="Model slug for OpenRouter post-processing.")
+    ap = argparse.ArgumentParser("Post-process then summarise (HF by default).")
     ap.add_argument("--hf_model", required=True, choices=HF_MODELS.keys(),
-                    help="Local HF model for summarisation.")
+                    help="HuggingFace model id to use (both steps by default).")
+    ap.add_argument("--or_model", choices=OR_MODELS.keys(),
+                    help="OpenRouter model for post-processing only.")
     ap.add_argument("--input_dir", required=True)
     ap.add_argument("--post_dir", required=True)
     ap.add_argument("--summary_dir", required=True)
@@ -177,40 +183,60 @@ def main() -> None:
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--dtype", choices=["auto", "fp16", "bf16", "fp32"],
                     default="auto")
+    ap.add_argument("--skip_post", action="store_true",
+                    help="Skip Step 1; use existing *.post.txt in --post_dir.")
     args = ap.parse_args()
 
-    in_dir = Path(args.input_dir).expanduser()
+    in_dir   = Path(args.input_dir).expanduser()
     post_dir = Path(args.post_dir).expanduser(); post_dir.mkdir(parents=True, exist_ok=True)
-    sum_dir = Path(args.summary_dir).expanduser(); sum_dir.mkdir(parents=True, exist_ok=True)
+    sum_dir  = Path(args.summary_dir).expanduser(); sum_dir.mkdir(parents=True, exist_ok=True)
 
     post_tmpl = Path(args.post_prompt).read_text()
-    sum_tmpl = Path(args.summary_prompt).read_text()
+    sum_tmpl  = Path(args.summary_prompt).read_text()
 
-    # init HF pipeline
+    # HF pipeline
     repo_id = HF_MODELS[args.hf_model]
     ctx_max = HF_CTX[args.hf_model]
-    pipe = get_hf_pipeline(repo_id, dtype_choice=args.dtype,
-                           token=os.getenv("HUGGINGFACE_HUB_TOKEN"))
+    pipe = get_hf_pipeline(repo_id, dtype_choice=args.dtype)
 
-    files = sorted(in_dir.glob("*.txt"))
-    if not files:
-        sys.exit(f"No .txt files in {in_dir}")
+    # decide file list
+    if args.skip_post:
+        files = sorted(post_dir.glob("*.post.txt"))
+        if not files:
+            sys.exit("--skip_post but no *.post.txt in post_dir")
+    else:
+        files = sorted(in_dir.glob("*.txt"))
+        if not files:
+            sys.exit("No *.txt in input_dir")
+
+    use_openrouter = (args.or_model is not None) and (not args.skip_post)
 
     with Progress() as bar:
         task = bar.add_task("[green]Processing…", total=len(files))
         for fp in files:
-            raw = fp.read_text()
+            if args.skip_post:
+                processed = fp.read_text()
+                base = fp.stem.split(".post", 1)[0]
+            else:
+                raw = fp.read_text()
+                if use_openrouter:
+                    processed = or_generate(
+                        OR_MODELS[args.or_model],
+                        render(post_tmpl, raw),
+                        max_tokens=args.max_tokens,
+                        temperature=args.temperature,
+                    )
+                else:
+                    processed = hf_generate(
+                        pipe,
+                        render(post_tmpl, raw),
+                        max_tokens=args.max_tokens,
+                        temperature=args.temperature,
+                        ctx_limit=ctx_max,
+                    )
+                (post_dir / f"{fp.stem}.post.txt").write_text(processed)
+                base = fp.stem
 
-            # 1️⃣ post-process via OpenRouter
-            processed = call_or(
-                OR_MODELS[args.or_model],
-                render(post_tmpl, raw),
-                max_tokens=args.max_tokens,
-                temperature=args.temperature,
-            )
-            (post_dir / f"{fp.stem}.post.txt").write_text(processed)
-
-            # 2️⃣ summarise locally
             summary = hf_generate(
                 pipe,
                 render(sum_tmpl, processed),
@@ -218,10 +244,10 @@ def main() -> None:
                 temperature=args.temperature,
                 ctx_limit=ctx_max,
             )
-            (sum_dir / f"{fp.stem}.sum.txt").write_text(summary)
+            (sum_dir / f"{base}.sum.txt").write_text(summary)
             bar.advance(task)
 
-    print(f"✅ {len(files)} files → {post_dir}  |  summaries → {sum_dir}")
+    print(f"✅ Done. Post-files → {post_dir} | Summaries → {sum_dir}")
 
 
 if __name__ == "__main__":

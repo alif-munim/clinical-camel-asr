@@ -6,11 +6,12 @@
 Set up your environment and API keys.
 ```
 conda activate clinical_canary
+cd clinical-canary
 export OPENROUTER_API_KEY=<api-key>
 export OPENAI_API_KEY=<api-key>
 ```
 
-Transcribe all of your audio files.
+Transcribe all of your audio files (if you have m4a files, use the `m4a_to_wav.py` script).
 ```
 python transcribe_turbo.py --input_dir /home/jma/Documents/clinical-canary/0424_audio_wav --output_dir /home/jma/Documents/clinical-canary/0424_audio_transcripts --use_vad
 ```
@@ -44,19 +45,35 @@ python eval_batch.py \
 
 ## HuggingFace
 
+If you don't specify `--or_model`, the same HF model will be used for postprocessing and summarization.
 ```
 export RUN_DATE=0504 # or whatever identifier you want to use
-export RUN_MODEL=medgemma-27b 
+export RUN_MODEL=medgemma-4b 
 python postprocess_and_summarize_hf.py \
   --or_model qwen3-32b \
-  --hf_model medgemma-27b \
+  --hf_model "$RUN_MODEL" \
   --input_dir  "${RUN_DATE}_audio_transcripts" \
   --post_dir   "${RUN_DATE}_postprocessed_qwen32b" \
   --summary_dir "${RUN_DATE}_summarized_medgemma27b" \
   --post_prompt    prompts/postprompt_v1.txt \
   --summary_prompt prompts/summaryprompt_v1.txt \
   --max_tokens 8192 \
-  --temperature 0
+  --temperature 0 \
+  --skip_post
+```
+
+Evaluate all of your summaries against ground truth transcripts.
+```
+export RUN_MODEL=medgemma27b 
+ROOT=/home/jma/Documents/clinical-canary
+python eval_batch.py \
+  --prompt       "$ROOT/prompts/eval_v1.txt" \
+  --gt-dir       "$ROOT/${RUN_DATE}_audio_transcripts" \
+  --sum-dir      "$ROOT/${RUN_DATE}_summarized_${RUN_MODEL}" \
+  --results-dir  "$ROOT/${RUN_DATE}_eval_results_${RUN_MODEL}" \
+  --prompts-dir  "$ROOT/${RUN_DATE}_eval_prompts_${RUN_MODEL}" \
+  --api-base     "https://api.openai.com/v1" \
+  --temperature  0
 ```
 
 ## Misc

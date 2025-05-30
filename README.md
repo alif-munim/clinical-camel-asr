@@ -13,13 +13,13 @@ export OPENAI_API_KEY=<api-key>
 
 Transcribe all of your audio files (if you have m4a files, use the `m4a_to_wav.py` script).
 ```
-python transcribe_turbo.py --input_dir /home/jma/Documents/clinical-canary/0424_audio_wav --output_dir /home/jma/Documents/clinical-canary/0424_audio_transcripts --use_vad
+python transcribe_turbo.py --input_dir /home/jma/Documents/clinical-canary/0523_audio_wav --output_dir /home/jma/Documents/clinical-canary/0523_audio_transcripts --use_vad
 ```
 
 Postprocess and summarize with the model of your choice.
 ```
-export RUN_DATE=0504 # or whatever identifier you want to use
-export RUN_MODEL=gemma-27b # other options are deepseek, qwq-32b, and qwen-72b
+export RUN_DATE=0529 # or whatever identifier you want to use
+export RUN_MODEL=llama-3.1-8b # other options are deepseek, qwq-32b, and qwen-72b
 python postprocess_and_summarize.py \
   --model        "$RUN_MODEL" \
   --input_dir    "${RUN_DATE}_audio_transcripts" \
@@ -27,11 +27,13 @@ python postprocess_and_summarize.py \
   --summary_dir  "${RUN_DATE}_summarized_${RUN_MODEL}" \
   --post_prompt prompts/postprompt_v1.txt \
   --summary_prompt prompts/summaryprompt_v1.txt \
-  --max_tokens 64000
+  --max_tokens 10000
 ```
 
 Evaluate all of your summaries against ground truth transcripts.
 ```
+export RUN_DATE=0530 # or whatever identifier you want to use
+export RUN_MODEL=phi-4 # other options are deepseek, qwq-32b, and qwen-72b
 ROOT=/home/jma/Documents/clinical-canary
 python eval_batch.py \
   --prompt       "$ROOT/prompts/eval_v1.txt" \

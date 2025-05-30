@@ -128,7 +128,7 @@ def main() -> None:
     # ----- OpenAI / Batch settings -----
     ap.add_argument("--results-dir", required=True, help="Folder to write *.out.txt files")
     ap.add_argument("--prompts-dir", help="Folder to save input prompts for debugging")
-    ap.add_argument("--model", default="gpt-4o-2024-05-13", help="Model name (default: gpt-4o-2024-05-13)")
+    ap.add_argument("--model", default="gpt-4.1-2025-04-14", help="Model name (default: gpt-4.1-2025-04-14)")
     ap.add_argument("--api-base", default="https://api.openai.com/v1", help="API base URL")
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--poll-interval", type=int, default=8, help="Polling seconds")

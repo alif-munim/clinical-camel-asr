@@ -16,10 +16,19 @@ from string import Template
 
 # ------------------------ model map ------------------------
 MODEL_ALIASES: Dict[str, str] = {
-    "qwen-72b":  "qwen/qwen-2.5-72b-instruct",
+    "qwen2.5-72b":  "qwen/qwen-2.5-72b-instruct",
+    "qwen3-8b": "qwen/qwen3-8b",
+    "qwen3-14b": "qwen/qwen3-14b",
+    "qwen3-32b": "qwen/qwen3-32b",
+    "qwen3-a3b": "qwen/qwen3-30b-a3b",
     "qwq-32b":   "qwen/qwq-32b",
     "gemma-27b": "google/gemma-3-27b-it",
-    "deepseek":  "deepseek/deepseek-chat-v3-0324"
+    "deepseek":  "deepseek/deepseek-chat-v3-0324",
+    "llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct",
+    "llama-3.1-70b": "meta-llama/llama-3.1-70b-instruct",
+    "llama-3.3-70b": "meta-llama/llama-3.3-70b-instruct",
+    "phi-4": "microsoft/phi-4",
+    "gemma-3-27b": "google/gemma-3-27b-it"
 }
 # -----------------------------------------------------------
 
@@ -43,6 +52,7 @@ def call_llm(client: OpenAI, model: str, prompt: str,
              retries: int = 3, retry_backoff: float = 2.0) -> str:
     """Robust wrapper around chat.completions.create()."""
     attempt, err = 0, None
+    last_exception = None
     while attempt <= retries:
         try:
             resp = client.chat.completions.create(
@@ -53,13 +63,42 @@ def call_llm(client: OpenAI, model: str, prompt: str,
             )
             return resp.choices[0].message.content.strip()
         except OpenAIError as e:
-            err = e
+            last_exception = e
+            print(f"OpenAIError on attempt {attempt + 1}: {e}", file=sys.stderr)
+            # You might want to inspect e.response.text if available and relevant
+            # or e.http_status, e.code etc.
             attempt += 1
             if attempt > retries:
-                raise
+                break # exit loop to raise last_exception
             time.sleep(retry_backoff ** attempt)
-    raise err   # never reached
+        except json.JSONDecodeError as e_json: # Catch JSONDecodeError specifically
+            last_exception = e_json
+            print(f"JSONDecodeError on attempt {attempt + 1}: {e_json}", file=sys.stderr)
+            # This is where you'd try to get the raw response text if the OpenAI client
+            # doesn't bubble it up directly in the exception.
+            # Unfortunately, the error occurs *after* httpx has tried to parse .json(),
+            # so accessing the raw text from the exception `e_json` itself is not direct.
+            # The best way is to log it *before* the line that fails.
+            # For now, we'll just print the error and retry or fail.
+            # A more robust solution would involve making the request with httpx directly
+            # or modifying the OpenAI client to expose the raw response on error.
+            print("The API returned a non-JSON response. This often indicates a server-side error or HTML error page.", file=sys.stderr)
+            attempt += 1
+            if attempt > retries:
+                break
+            time.sleep(retry_backoff ** attempt)
+        except Exception as e_generic: # Catch any other unexpected errors
+            last_exception = e_generic
+            print(f"Generic error on attempt {attempt + 1}: {e_generic}", file=sys.stderr)
+            attempt += 1
+            if attempt > retries:
+                break
+            time.sleep(retry_backoff ** attempt)
 
+    if last_exception:
+        raise last_exception # Re-raise the last caught exception
+    # Should not be reached if retries are exhausted and an exception was caught
+    raise RuntimeError("call_llm failed after multiple retries without specific exception.")
 
 def render(template: str, text: str) -> str:
     """Insert text into template at $input while leaving other braces alone."""

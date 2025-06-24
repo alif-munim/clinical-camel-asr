@@ -5,15 +5,15 @@
 
 Set up your environment and API keys.
 ```
-conda activate clinical_canary
-cd clinical-canary
+conda activate clinical_camel
+export HOME_DIR=/home/bowang/Documents/alif/clinical-camel-asr
 export OPENROUTER_API_KEY=<api-key>
 export OPENAI_API_KEY=<api-key>
 ```
 
 Transcribe all of your audio files (if you have m4a files, use the `m4a_to_wav.py` script).
 ```
-python transcribe_turbo.py --input_dir /home/jma/Documents/clinical-canary/0523_audio_wav --output_dir /home/jma/Documents/clinical-canary/0523_audio_transcripts --use_vad
+python transcribe_turbo.py --input_dir $HOME_DIR/wav_audio --output_dir $HOME_DIR/0624_audio_transcripts_vad --use_vad
 ```
 
 Postprocess and summarize with the model of your choice.

@@ -3,9 +3,8 @@
 """
 transcribe_turbo.py – batch ASR with Whisper-v3-turbo + optional Silero VAD
 
-MODIFIED (v5): Incorporates a robust pipeline-based approach for long-form
-transcription, fixing previous issues with premature stopping. It now correctly
-processes entire long audio files by using the pipeline's built-in chunking.
+MODIFIED (v6): Adds command-line arguments for fine-tuning Silero VAD
+parameters, allowing for better speech detection in various audio conditions.
 """
 
 # ── sanity-check core deps ────────────────────────────────────────────────
@@ -57,6 +56,7 @@ def get_whisper_pipeline(
     chunk_length_s=30,
     batch_size=24,
 ):
+    """Initializes and returns the Whisper pipeline, loading it only once."""
     global _PIPE
     if _PIPE is not None:
         return _PIPE
@@ -93,6 +93,7 @@ def get_whisper_pipeline(
 
 ### Helper functions
 def load_silero_vad():
+    """Loads the Silero VAD model and utilities from torch.hub."""
     model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
                                   model='silero_vad',
                                   force_reload=False,
@@ -101,6 +102,7 @@ def load_silero_vad():
     return model, get_speech_timestamps, read_audio
 
 def get_audio_length(audio_file):
+    """Returns the duration of an audio file in seconds."""
     try:
         duration = librosa.get_duration(path=audio_file)
         return duration
@@ -109,7 +111,7 @@ def get_audio_length(audio_file):
         return None
 
 # ==============================================================================
-# THIS FUNCTION HAS BEEN REPLACED WITH THE WORKING PIPELINE LOGIC
+# Main Transcription Function
 # ==============================================================================
 def transcribe_audio_with_whisper(
     audio_file: str,
@@ -118,6 +120,10 @@ def transcribe_audio_with_whisper(
     compression_ratio_threshold: Optional[float] = None,
     logprob_threshold: Optional[float] = None,
     no_speech_threshold: Optional[float] = None,
+    vad_threshold: float = 0.5,
+    vad_min_speech_duration_ms: int = 250,
+    vad_min_silence_duration_ms: int = 100,
+    vad_speech_pad_ms: int = 30,
 ):
     """
     Transcribe audio using Whisper, with optional VAD and generation parameters.
@@ -125,7 +131,7 @@ def transcribe_audio_with_whisper(
     """
     pipe = pipe_config["instance"]
     
-    # Build the dictionary for optional generation args.
+    # Build the dictionary for optional generation args for Whisper.
     generate_kwargs = {}
     if compression_ratio_threshold is not None:
         generate_kwargs["compression_ratio_threshold"] = compression_ratio_threshold
@@ -140,13 +146,20 @@ def transcribe_audio_with_whisper(
     
     try:
         if use_vad:
-            # The VAD path works correctly by design, as it processes small chunks.
+            # The VAD path processes audio by finding speech chunks first.
             print("VAD enabled: Pre-processing audio to find speech segments...")
             vad_model, get_speech_timestamps, read_audio = load_silero_vad()
             SAMPLING_RATE = 16000
             wav = read_audio(audio_file, sampling_rate=SAMPLING_RATE)
+            
+            # Use the provided VAD parameters
             speech_timestamps = get_speech_timestamps(
-                wav, vad_model, 
+                wav,
+                vad_model,
+                threshold=vad_threshold,
+                min_speech_duration_ms=vad_min_speech_duration_ms,
+                min_silence_duration_ms=vad_min_silence_duration_ms,
+                speech_pad_ms=vad_speech_pad_ms,
                 sampling_rate=SAMPLING_RATE,
                 return_seconds=True
             )
@@ -158,21 +171,16 @@ def transcribe_audio_with_whisper(
             
             full_transcription = []
             for segment in speech_timestamps:
-                start_time = segment['start']
-                end_time = segment['end']
-                chunk_tensor = wav[int(start_time * SAMPLING_RATE):int(end_time * SAMPLING_RATE)]
+                chunk_tensor = wav[int(segment['start'] * SAMPLING_RATE):int(segment['end'] * SAMPLING_RATE)]
                 # The pipeline can handle numpy arrays directly
                 chunk_numpy = chunk_tensor.numpy()
                 
-                result = pipe(
-                    chunk_numpy,
-                    generate_kwargs=generate_kwargs
-                )
+                result = pipe(chunk_numpy, generate_kwargs=generate_kwargs)
                 full_transcription.append(result['text'].strip())
             return " ".join(full_transcription)
 
         else:
-            # THIS IS THE ROBUST IMPLEMENTATION FOR NON-VAD, LONG-FORM AUDIO
+            # This is the robust implementation for non-VAD, long-form audio
             print("VAD disabled: Transcribing entire file with chunking...")
             
             result = pipe(
@@ -188,23 +196,38 @@ def transcribe_audio_with_whisper(
         print(f"Error transcribing audio file {audio_file}: {e}")
         return None
 # ==============================================================================
-# END OF REPLACEMENT FUNCTION
+# End of Transcription Function
 # ==============================================================================
+
 def find_audio_files(input_dir, file_pattern="**/*.wav"):
+    """Finds all audio files in a directory matching a pattern."""
     return sorted(list(Path(input_dir).rglob(file_pattern)))
 
 def main():
+    """Main function to parse arguments and process audio files."""
     parser = argparse.ArgumentParser(description="Batch transcribe audio files with Whisper and optional VAD.")
+    
+    # --- I/O Arguments ---
     parser.add_argument("--input_dir", required=True, help="Directory containing audio files (e.g., WAV, MP3, FLAC).")
     parser.add_argument("--output_dir", required=True, help="Directory to save transcription text files.")
+    
+    # --- Performance Arguments ---
     parser.add_argument("--use_flash_attention", action="store_true", help="Use Flash Attention 2 for faster inference (requires compatible hardware).")
     parser.add_argument("--chunk_length", type=int, default=30, help="Chunk length in seconds for long-form transcription (used when VAD is disabled).")
     parser.add_argument("--batch_size", type=int, default=24, help="Batch size for long-form transcription (used when VAD is disabled).")
     parser.add_argument("--limit", type=int, default=0, help="Limit the number of files to process (0 for no limit).")
+    
+    # --- VAD Control Arguments ---
     parser.add_argument("--use_vad", action="store_true", help="Use Silero VAD to detect speech and transcribe only speech segments.")
-    parser.add_argument("--compression_ratio_threshold", type=float, default=2.4, help="If the gzip compression ratio is higher than this value, treat the segment as background noise. Default: 2.4")
-    parser.add_argument("--logprob_threshold", type=float, default=-1.0, help="If the average log probability is lower than this value, treat the segment as silence. Default: -1.0")
-    parser.add_argument("--no_speech_threshold", type=float, default=0.6, help="If the probability of the <|nospeech|> token is higher than this value, suppress the segment. Default: 0.6")
+    parser.add_argument("--vad_threshold", type=float, default=0.5, help="Speech probability threshold for VAD. Default: 0.5")
+    parser.add_argument("--vad_min_speech_duration_ms", type=int, default=250, help="VAD: Minimum speech duration in ms. Default: 250")
+    parser.add_argument("--vad_min_silence_duration_ms", type=int, default=100, help="VAD: Minimum silence duration in ms. Default: 100")
+    parser.add_argument("--vad_speech_pad_ms", type=int, default=30, help="VAD: Padding on each side of speech segment in ms. Default: 30")
+
+    # --- Whisper Generation Arguments ---
+    parser.add_argument("--compression_ratio_threshold", type=float, default=2.4, help="Whisper: If gzip compression ratio is > this value, treat as background noise. Default: 2.4")
+    parser.add_argument("--logprob_threshold", type=float, default=-1.0, help="Whisper: If avg log probability is < this value, treat as silence. Default: -1.0")
+    parser.add_argument("--no_speech_threshold", type=float, default=0.6, help="Whisper: If <|nospeech|> token probability is > this value, suppress segment. Default: 0.6")
     
     args = parser.parse_args()
     
@@ -219,7 +242,8 @@ def main():
     print(f"Found {len(audio_files)} audio files to process.")
     
     if args.use_vad:
-        print("Voice Activity Detection (VAD) is ENABLED. Transcription will focus only on detected speech segments.")
+        print("Voice Activity Detection (VAD) is ENABLED.")
+        print(f"  - VAD Settings: threshold={args.vad_threshold}, min_speech={args.vad_min_speech_duration_ms}ms, min_silence={args.vad_min_silence_duration_ms}ms, padding={args.vad_speech_pad_ms}ms")
     else:
         print("Voice Activity Detection (VAD) is DISABLED. The entire audio file will be transcribed.")
 
@@ -256,13 +280,18 @@ def main():
             print(f"Audio duration: {audio_length:.2f} seconds")
             total_audio_length += audio_length
         
+        # Pass all the arguments to the transcription function
         transcription = transcribe_audio_with_whisper(
             str(audio_file),
             pipe_config,
-            args.use_vad,
+            use_vad=args.use_vad,
             compression_ratio_threshold=args.compression_ratio_threshold,
             logprob_threshold=args.logprob_threshold,
-            no_speech_threshold=args.no_speech_threshold
+            no_speech_threshold=args.no_speech_threshold,
+            vad_threshold=args.vad_threshold,
+            vad_min_speech_duration_ms=args.vad_min_speech_duration_ms,
+            vad_min_silence_duration_ms=args.vad_min_silence_duration_ms,
+            vad_speech_pad_ms=args.vad_speech_pad_ms
         )
         
         if transcription is None:

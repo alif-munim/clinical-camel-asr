@@ -16,6 +16,16 @@ Transcribe all of your audio files (if you have m4a files, use the `m4a_to_wav.p
 python transcribe_turbo.py --input_dir $HOME_DIR/wav_audio --output_dir $HOME_DIR/0624_audio_transcripts_vad --use_vad
 ```
 
+Enhanced VAD settings.
+```
+python transcribe_turbo.py \
+  --input_dir $HOME_DIR/wav_audio \
+  --output_dir $HOME_DIR/0630_audio_transcripts \
+  --use_vad
+```
+
+
+
 Postprocess and summarize with the model of your choice.
 ```
 export RUN_DATE=0529 # or whatever identifier you want to use

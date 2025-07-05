@@ -1,0 +1,23 @@
+{
+    "name": "my-transcription-postprocessing-task",
+    "dataset": "https://smith.langchain.com/public/c4dd8ea1-e2e7-443a-b299-719167627f7d/d",
+    "description": "Optimize a prompt to correct and format raw transcriptions.",
+    "evaluators": "./task.py:evaluators",
+    "optimizer": {
+      "model": {
+        "model": "gpt-4.1-mini"
+      }
+    },
+    "algorithm": {
+        "batch_size": 1,
+        "epochs": 10,
+        "debug": false
+    },
+    "initial_prompt": {
+    "prompt_str": "You are an expert transcription editor. Your task is to correct the following transcript for errors, repetitions, and filler words. Output only the corrected transcript.\n\nTRANSCRIPT:\n{inputs}",
+    "model_config": {
+        "model": "gpt-4.1-mini"
+    }
+    },
+    "$schema": "https://raw.githubusercontent.com/hinthornw/promptimizer/refs/heads/main/config-schema.json"
+  }

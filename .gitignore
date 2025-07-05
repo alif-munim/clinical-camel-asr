@@ -1,4 +1,9 @@
 __pycache__
-audio/
+*audio/
 *results/
 *plots/
+misc/
+logs/
+silero-vad/
+pretrained_models/
+prompt_optimization/**/~

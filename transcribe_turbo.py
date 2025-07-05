@@ -3,8 +3,10 @@
 """
 transcribe_turbo.py – batch ASR with Whisper-v3-turbo + optional Silero VAD
 
-MODIFIED (v6): Adds command-line arguments for fine-tuning Silero VAD
-parameters, allowing for better speech detection in various audio conditions.
+MODIFIED (v7): Adds a command-line argument to specify the transcription
+language, effectively allowing the user to disable multilingual auto-detection
+and force a single language output (e.g., English). Also includes fine-tuning
+for Silero VAD parameters.
 """
 
 # ── sanity-check core deps ────────────────────────────────────────────────
@@ -116,6 +118,7 @@ def get_audio_length(audio_file):
 def transcribe_audio_with_whisper(
     audio_file: str,
     pipe_config: dict,
+    language: str = "english",
     use_vad: bool = False,
     compression_ratio_threshold: Optional[float] = None,
     logprob_threshold: Optional[float] = None,
@@ -133,6 +136,12 @@ def transcribe_audio_with_whisper(
     
     # Build the dictionary for optional generation args for Whisper.
     generate_kwargs = {}
+    
+    # Add the language to the generation arguments. This is the correct way
+    # to force a specific language and disable multilingual auto-detection.
+    if language:
+        generate_kwargs["language"] = language
+    
     if compression_ratio_threshold is not None:
         generate_kwargs["compression_ratio_threshold"] = compression_ratio_threshold
     if logprob_threshold is not None:
@@ -225,6 +234,7 @@ def main():
     parser.add_argument("--vad_speech_pad_ms", type=int, default=30, help="VAD: Padding on each side of speech segment in ms. Default: 30")
 
     # --- Whisper Generation Arguments ---
+    parser.add_argument("--language", type=str, default="english", help="Language for transcription (e.g., 'en', 'es'). Default: 'english'.")
     parser.add_argument("--compression_ratio_threshold", type=float, default=2.4, help="Whisper: If gzip compression ratio is > this value, treat as background noise. Default: 2.4")
     parser.add_argument("--logprob_threshold", type=float, default=-1.0, help="Whisper: If avg log probability is < this value, treat as silence. Default: -1.0")
     parser.add_argument("--no_speech_threshold", type=float, default=0.6, help="Whisper: If <|nospeech|> token probability is > this value, suppress segment. Default: 0.6")
@@ -284,6 +294,7 @@ def main():
         transcription = transcribe_audio_with_whisper(
             str(audio_file),
             pipe_config,
+            language=args.language,
             use_vad=args.use_vad,
             compression_ratio_threshold=args.compression_ratio_threshold,
             logprob_threshold=args.logprob_threshold,

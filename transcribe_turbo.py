@@ -3,10 +3,9 @@
 """
 transcribe_turbo.py – batch ASR with Whisper-v3-turbo + optional Silero VAD
 
-MODIFIED (v7): Adds a command-line argument to specify the transcription
-language, effectively allowing the user to disable multilingual auto-detection
-and force a single language output (e.g., English). Also includes fine-tuning
-for Silero VAD parameters.
+MODIFIED (v8): Implements a prompting strategy to preserve context between VAD segments.
+The transcription of each segment is used as a prompt for the next, improving
+coherence and accuracy for VAD-enabled transcriptions.
 """
 
 # ── sanity-check core deps ────────────────────────────────────────────────
@@ -176,17 +175,37 @@ def transcribe_audio_with_whisper(
                 print("VAD found no speech segments. Skipping transcription.")
                 return ""
             
-            print(f"VAD found {len(speech_timestamps)} speech segment(s). Transcribing each segment...")
+            print(f"VAD found {len(speech_timestamps)} speech segment(s). Transcribing with context preservation...")
             
-            full_transcription = []
-            for segment in speech_timestamps:
+            # --- START OF MODIFICATIONS FOR CONTEXT PRESERVATION ---
+            
+            # 1. Initialize a list to hold the text from each transcribed chunk.
+            transcribed_chunks = []
+            
+            for i, segment in enumerate(speech_timestamps):
                 chunk_tensor = wav[int(segment['start'] * SAMPLING_RATE):int(segment['end'] * SAMPLING_RATE)]
                 # The pipeline can handle numpy arrays directly
                 chunk_numpy = chunk_tensor.numpy()
                 
-                result = pipe(chunk_numpy, generate_kwargs=generate_kwargs)
-                full_transcription.append(result['text'].strip())
-            return " ".join(full_transcription)
+                # 2. Create a prompt from all previously transcribed text.
+                prompt = " ".join(transcribed_chunks)
+                
+                # 3. Create a copy of the generation args and add the prompt.
+                #    This ensures the prompt from one chunk is passed to the next.
+                current_generate_kwargs = generate_kwargs.copy()
+                current_generate_kwargs["prompt"] = prompt
+                
+                print(f"  - Transcribing segment {i+1}/{len(speech_timestamps)}...")
+                result = pipe(chunk_numpy, generate_kwargs=current_generate_kwargs)
+                new_text = result['text'].strip()
+                
+                # 4. Append the newly transcribed text to our list for the next iteration.
+                transcribed_chunks.append(new_text)
+
+            # 5. Join all the transcribed chunks together at the very end.
+            return " ".join(transcribed_chunks)
+            
+            # --- END OF MODIFICATIONS ---
 
         else:
             # This is the robust implementation for non-VAD, long-form audio

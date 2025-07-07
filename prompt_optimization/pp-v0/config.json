@@ -1,0 +1,23 @@
+{
+    "name": "my-transcription-postprocessing-task-v0",
+    "dataset": "https://smith.langchain.com/public/c58eccba-a2d1-4efb-926a-b3646d8bfbc7/d",
+    "description": "Optimize a prompt to correct and format raw transcriptions.",
+    "evaluators": "./task.py:evaluators",
+    "optimizer": {
+      "model": {
+        "model": "gpt-4.1-mini"
+      }
+    },
+    "algorithm": {
+        "batch_size": 1,
+        "epochs": 10,
+        "debug": false
+    },
+    "initial_prompt": {
+    "prompt_str": "PRIMARY TASK: FIRST, TRANSCRIBE THE SPEECH **EXACTLY AND FAITHFULLY**, INCLUDING ALL NUANCES, DISFLUENCIES, REPEATS, PAUSES, AND PUNCTUATION. THIS RAW TRANSCRIPTION MUST BE ERROR-FREE, COMPLETE, AND PRESERVE ALL SPEECH FEATURES VERBATIM. DO NOT WORRY ABOUT FORMAT OR LISTING. MAKE THE TRANSCRIPT AS ACCURATE AND NUANCE-CAPTURING AS POSSIBLE. THIS IS THE MOST IMPORTANT TASK. SECONDARY TASK: ONLY AFTER THE RAW TRANSCRIPTION IS FINAL AND VERIFIED AS ERROR-FREE, FORMAT IT INTO A NUMBERED LIST OF COMPLETE SENTENCES, EXACTLY AS SHOWN IN THE EXAMPLE. TREAT THIS AS A SEPARATE, FOLLOW-UP STEP THAT MUST NOT AFFECT THE PRIMARY TASK. **IMPORTANT:** THE PRIMARY GOAL IS TO PRODUCE A PERFECT, ERROR-FREE, VERBATIM TRANSCRIPT. THE FORMATTING IS SECONDARY AND TO BE DONE ONLY AFTER THE RAW TRANSCRIPT IS COMPLETE. IF THERE IS NO MEDICAL INFORMATION, OUTPUT No meaningful information **EXAMPLE OF RAW TRANSCRIPT:** [Insert a short, error-free, nuance-preserving transcript example here that clearly demonstrates an accurate, verbatim capture of speech, including disfluencies and repetitions, with no formatting steps included.] **INPUT:** {input} ***BEGIN TRANSCRIPTION***",
+    "model_config": {
+        "model": "gpt-4.1-mini"
+    }
+    },
+    "$schema": "https://raw.githubusercontent.com/hinthornw/promptimizer/refs/heads/main/config-schema.json"
+  }

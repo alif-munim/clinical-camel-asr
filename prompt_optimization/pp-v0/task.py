@@ -31,15 +31,15 @@ def wer_evaluator(run: Run, example: Example) -> dict:
         # Get hypothesis and reference strings
         output_dict = run.outputs
         hypothesis = str(output_dict['content'])
-        reference = str(example.outputs.get("outputs", ""))
+        reference = str(example.outputs.get("gt", ""))
 
         # --- START DEBUG PRINTS ---
-        print("───────────────────────────────────")
-        print("HYPOTHESIS (Model Output):")
-        print(repr(hypothesis))
-        print("\nREFERENCE (Ground Truth):")
-        print(repr(reference))
-        print("───────────────────────────────────")
+        # print("───────────────────────────────────")
+        # print("HYPOTHESIS (Model Output):")
+        # print(repr(hypothesis))
+        # print("\nREFERENCE (Ground Truth):")
+        # print(repr(reference))
+        # print("───────────────────────────────────")
         # --- END DEBUG PRINTS ---
 
         wer_score = calculate_wer(reference, hypothesis)

@@ -1,8 +1,5 @@
 # clinical-canary
 
-
-## Quickstart on Workstation
-
 Set up your environment and API keys.
 ```
 conda activate clinical_camel
@@ -10,6 +7,37 @@ export HOME_DIR=/home/bowang/Documents/alif/clinical-camel-asr
 export OPENROUTER_API_KEY=<api-key>
 export OPENAI_API_KEY=<api-key>
 ```
+
+## Prompt Optimization
+
+Create a new conda environment and set your `LANGSMITH_API_KEY`
+```
+export LANGSMITH_API_KEY=<your-key>
+cd <your-home-dir>
+conda create -n promptim python=3.12
+cp /home/bowang/Documents/alif/promptimizer <your-home-dir>
+cd <your-home-dir>/promptimizer
+pip install -e .
+```
+
+Copy an existing prompt optimization task and create your own.
+```
+cp prompt_optimization/pp-v2 prompt_optimization/<new-task>
+```
+
+Modify `config.json`, specifically the `dataset` and `prompt_str` fields. Start with a simple `prompt_str`.
+
+Set up your dataset on https://smith.langchain.com/. Then set it to public and get the link. It will look something like this: https://smith.langchain.com/public/6ed521df-c0d8-42b7-a0db-48dd73a0c680/d <br>
+
+Take note of your input and output fields when uploading your CSV. These will need to be changed in `task.py`, as well as the evaluators (if you aren't optimizing for WER) <br>
+
+Once everything is ready, start training.
+```
+promptim train --task ./<your-task>/config.json
+```
+
+
+## Quickstart on Workstation
 
 Transcribe all of your audio files (if you have m4a files, use the `m4a_to_wav.py` script).
 ```

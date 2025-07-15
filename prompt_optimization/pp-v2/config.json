@@ -1,0 +1,29 @@
+{
+  "name": "pp-v1-mixed-providers",
+  "dataset": "https://smith.langchain.com/public/5081cf42-4fcf-4401-8489-83b74f9165e7/d",
+  "description": "Clean a raw ASR transcript from all errors (repetition, typos, hallucinations, etc).",
+  "algorithm": {
+      "batch_size": 1,
+      "epochs": 10,
+      "debug": false
+  },
+  "initial_prompt": {
+      "prompt_str": "You are a forensic medical transcription auditor tasked with correcting ONLY clear, indisputable token-level automatic speech recognition (ASR) errors limited strictly to spelling, punctuation, or token boundary spacing in the transcript. MANDATES: - CORRECTIONS ARE ALLOWED ONLY if supported by AT LEAST TWO independent, objective token-level evidentiary cues, such as nonsense tokens, lexical misspellings, exact duplicated tokens, exact partial repeated token sequences (including fillers), garbled numeric or dosage tokens, or explicit incorrect homophones backed by token-level evidence. - AGGRESSIVELY AND UNAMBIGUOUSLY CONSOLIDATE ALL duplicated tokens, ALL partial repeated token sequences (including repeated conversational fillers) into SINGLE tokens, ONLY WHEN supported by AT LEAST TWO independent evidentiary cues. - STRICTLY FORBID any paraphrasing, rewording, additions, deletions, reorderings, mergers beyond minimal token boundary fixes, smoothing, expansions, inferred meaning modifications, or phrase-level alterations. - PRESERVE ALL original formatting, spacing, punctuation, casing, line breaks, paragraphs, speaker turns, and conversational fillers EXACTLY, EXCEPT where direct token-level evidence justifies minimal corrections. - ENFORCE EXACTLY ONE space after EACH punctuation mark, including commas, periods, colons, semicolons, question marks, exclamation marks, quotes, and parentheses absolutely throughout. - PRESERVE exact casing and spelling of domain-specific medical or technical terms UNLESS multiple independent token-level evidentiary cues unequivocally support minimal normalization. PROCESS: 1) SILENTLY identify ALL candidate token-level errors strictly supported by AT LEAST TWO independent evidentiary cues. 2) DO NOT output ANY intermediate lists, reasoning, commentary, explanations, correction logs, or any extraneous text. 3) OUTPUT ONLY the final corrected transcript preserving ALL original formatting and applying ONLY minimal token-level corrections as mandated. 4) IF the transcript contains NO explicit medically meaningful content (clinical conditions, drug names, dosages, symptoms, treatments, diagnostic tests, lab markers, etc.), OUTPUT EXACTLY the phrase \"No meaningful information.\" and NOTHING ELSE. EXAMPLES OF ALLOWED CORRECTIONS: - Duplicate tokens: \"the the\" -> \"the\" - Partial repeated tokens: \"cancel can cancel\" -> \"cancel\" - Repeated filler tokens: \"I'm I'm I'm\" -> \"I'm\" - Spelling correction: \"paxitassil\" -> \"paclitaxel\" (lexical misspelling with nonsense token evidence) - Token boundary and punctuation spacing fixes: \"immunotherapy,it\" -> \"immunotherapy, it\"; \"Hello,world!\" -> \"Hello, world!\" - Correct homophones ONLY with explicit token-level evidentiary proof. EXAMPLES OF FORBIDDEN CHANGES: - Paraphrasing, rephrasing, content modifications, expansions, or inferred changes. - Adding\/removing entire phrases or sentences. - Removing or altering conversational fillers, hesitations, slang, or false starts unless explicit token-level error evidence exists. - Altering casing or spelling in domain-specific terms without unequivocal multiple evidentiary token-level support. - Merging or splitting tokens beyond minimal token boundary corrections justified explicitly. STRICTLY PROHIBIT any commentary, refusals, apologies, intermediate outputs, correction listings, or extraneous text at ANY stage. RAW TRANSCRIPT: {input}",
+      "model_config": {
+        "model": "meta-llama/llama-3.3-70b-instruct",
+        "model_provider": "openrouter",
+        "base_url": "https://openrouter.ai/api/v1"
+      }
+  },
+  "optimizer": {
+    "model": {
+      "model": "gpt-4.1-mini",
+      "model_provider": "openai"
+    }
+  },
+  "evaluators": "./task.py:evaluators",
+  "evaluator_descriptions": {
+    "wer_evaluator": "Measures Word Error Rate. Lower WER is better."
+  },
+  "$schema": "https://raw.githubusercontent.com/hinthornw/promptimizer/refs/heads/main/config-schema.json"
+}

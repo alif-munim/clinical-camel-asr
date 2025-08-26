@@ -1,37 +1,95 @@
 <h1 align="center">WhisperX</h1>
 
 ### First Time Setup
-
+After pulling the repository, you have to set up the `uv` env for whisperX.
 ```
-UV_HTTP_TIMEOUT=300 uv sync --all-extras --dev
+# make clean venv with uv
+uv venv
 source .venv/bin/activate
+
+# install all dev + extras
+uv sync --all-extras --dev
+
+# system deps (Ubuntu/Debian)
 sudo apt update
-sudo apt install libcudnn8 libcudnn8-dev -y
+sudo apt install ffmpeg libcudnn8 libcudnn8-dev -y
+
+# test install
+whisperx --help
+python -m whisperx --help
 ```
 
 ### Runtime Setup
+Make sure your `conda` env is deactivated, and the `uv` env is activated.
 ```
-source .venv/bin/activate
 conda deactivate
+source .venv/bin/activate
 ```
 
 ### Local Models
+Download all of the required models (alignment, diarization, asr) to a local `models/` directory.
 ```
 python download_models.py
 ```
 
 ### Test
+Try out a single example using the CLI tool.
 ```
 whisperx ./wav_audio/40-Post-opfollowupforsurgery-onlypatient-SurgicalOnc-Script-Claude.wav --vad_method silero
 ```
 
 ### Ready-to-use Script
+Try out the flexible python script.
+```
+usage: run_whisperx_local.py [-h] -i INPUT [-o OUTPUT] [--vad_method {pyannote,silero}] [--vad_onset VAD_ONSET]
+                             [--vad_offset VAD_OFFSET] [--chunk_size CHUNK_SIZE] [--diarize | --no-diarize]
+                             [--include-nonspeech-markers | --no-nonspeech-markers] [--num_speakers NUM_SPEAKERS]
+                             [--min_speakers MIN_SPEAKERS] [--max_speakers MAX_SPEAKERS] [--device DEVICE]
+                             [--compute_type COMPUTE_TYPE] [--batch_size BATCH_SIZE]
+```
+
+Example inputs.
 ```
 python run_whisperx_local.py --input ./wav_audio/40-Post-opfollowupforsurgery-onlypatient-SurgicalOnc-Script-Claude.wav --output test_single
 python run_whisperx_local.py --input ./wav_audio --output local_run --min_speakers 2 --max_speakers 4
 ```
 
+### Include Non-Speech Markers
+Extract the non-speech regions from VAD and explicitly tag them in the output.
+```
+python run_whisperx_local.py --input ./wav_audio/40-Post-opfollowupforsurgery-onlypatient-SurgicalOnc-Script-Claude.wav --output test_single --include-nonspeech-markers
+```
+
+Example diarized output:
+```
+[SPEAKER_00]: [UNTRANSCRIBED]
+[SPEAKER_00]: Good morning, Mrs. Wilson.
+[SPEAKER_00]: It's good to see you today.
+[SPEAKER_01]: Good morning, Dr. Martinez.
+[SPEAKER_00]: Later, somebody's going to join us, our nurse practitioner, Angela.
+[SPEAKER_00]: I think you've met before.
+[SPEAKER_00]: She'll come in a little bit.
+[SPEAKER_00]: How are you feeling today?
+[SPEAKER_00]: It's been about four weeks since her surgery.
+[SPEAKER_01]: Yes, I remember, Angela.
+[SPEAKER_01]: I'm feeling better than I was, but still pretty tired.
+[SPEAKER_01]: [UNTRANSCRIBED]
+[SPEAKER_01]: The incision is less painful now, though.
+[SPEAKER_00]: Okay, well, that's good to hear.
+[SPEAKER_00]: Well, let's go over your pathology results.
+[SPEAKER_00]: We'll also check the incision site.
+[SPEAKER_00]: We'll talk about recovery and then next steps.
+[SPEAKER_00]: Does that sound okay?
+[SPEAKER_01]: Yes, but I'm nervous about the results.
+[SPEAKER_00]: My husband wanted to be here, but he couldn't get off work.
+[SPEAKER_00]: I'm so sorry.
+[SPEAKER_00]: Well, would you like to call him and he can listen in and discuss?
+[SPEAKER_00]: No, I'll update him later.
+[SPEAKER_00]: [UNTRANSCRIBED]
+```
+
 ### Corrections
+Explicitly setting the number of speakers to correct the results (-2% DER)
 ```
 python run_whisperx_local.py --input ./wav_audio/21-PatientEducationformedoncpatient-Pharmacist-Audio-ChatGPT.wav --output corrected --num_speakers 4
 
@@ -44,7 +102,7 @@ python run_whisperx_local.py --input ./wav_audio/52-TreatmentVisit-changetreatme
 python run_whisperx_local.py --input ./wav_audio/3-NewPatient-RadiationOnc-Audio-ChatGPT.wav --output corrected --num_speakers 3
 ```
 
-
+<br><br>
 <p align="center">
   <a href="https://github.com/m-bain/whisperX/stargazers">
     <img src="https://img.shields.io/github/stars/m-bain/whisperX.svg?colorA=orange&colorB=orange&logo=github"

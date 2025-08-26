@@ -204,6 +204,18 @@ def align(
     
     # 2. Get prediction matrix from alignment model & align
     for sdx, segment in enumerate(transcript):
+
+        # Skip alignment for non-speech segments  
+        if segment.get('type') == 'non-speech':  
+            aligned_seg: SingleAlignedSegment = {  
+                "start": segment["start"],  
+                "end": segment["end"],   
+                "text": segment["text"],  
+                "words": [],  
+                "chars": None,  
+            }  
+            aligned_segments.append(aligned_seg)  
+            continue
         
         t1 = segment["start"]
         t2 = segment["end"]

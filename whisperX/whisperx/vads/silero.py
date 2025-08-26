@@ -63,4 +63,5 @@ class Silero(Vad):
             print("No active speech found in audio")
             return []
         assert segments_list, "segments_list is empty."
-        return Vad.merge_chunks(segments_list, chunk_size, onset, offset)
+        # return Vad.merge_chunks(segments_list, chunk_size, onset, offset)
+        return Vad.merge_chunks_with_nonspeech(segments_list, chunk_size, onset, offset)

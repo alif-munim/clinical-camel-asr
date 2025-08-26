@@ -212,15 +212,19 @@ class ResultWriter:
 class WriteTXT(ResultWriter):
     extension: str = "txt"
 
-    def write_result(self, result: dict, file: TextIO, options: dict):
-        for segment in result["segments"]:
-            speaker = segment.get("speaker")
-            text = segment["text"].strip()
-            if speaker is not None:
-                print(f"[{speaker}]: {text}", file=file, flush=True)
-            else:
+    def write_result(self, result: dict, file: TextIO, options: dict):  
+        for segment in result["segments"]:  
+            speaker = segment.get("speaker")  
+            text = segment["text"].strip()  
+            segment_type = segment.get("type", "speech")  
+            
+            # Handle non-speech segments  
+            if segment_type == "non-speech":  
+                print(text, file=file, flush=True)  # Just print [SILENCE] without speaker prefix  
+            elif speaker is not None:  
+                print(f"[{speaker}]: {text}", file=file, flush=True)  
+            else:  
                 print(text, file=file, flush=True)
-
 
 class SubtitlesWriter(ResultWriter):
     always_include_hours: bool
@@ -320,13 +324,21 @@ class SubtitlesWriter(ResultWriter):
                 else:
                     yield subtitle_start, subtitle_end, prefix + subtitle_text
         else:
+            # In the iterate_result method, add handling for non-speech segments  
             for segment in result["segments"]:
-                segment_start = self.format_timestamp(segment["start"])
-                segment_end = self.format_timestamp(segment["end"])
-                segment_text = segment["text"].strip().replace("-->", "->")
-                if "speaker" in segment:
-                    segment_text = f"[{segment['speaker']}]: {segment_text}"
-                yield segment_start, segment_end, segment_text
+                segment_type = segment.get("type", "speech")  
+                if segment_type == "non-speech":  
+                    segment_start = self.format_timestamp(segment["start"])  
+                    segment_end = self.format_timestamp(segment["end"])  
+                    segment_text = segment["text"].strip()  
+                    yield segment_start, segment_end, segment_text  
+                else:  
+                    segment_start = self.format_timestamp(segment["start"])
+                    segment_end = self.format_timestamp(segment["end"])
+                    segment_text = segment["text"].strip().replace("-->", "->")
+                    if "speaker" in segment:
+                        segment_text = f"[{segment['speaker']}]: {segment_text}"
+                    yield segment_start, segment_end, segment_text
 
     def format_timestamp(self, seconds: float):
         return format_timestamp(

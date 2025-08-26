@@ -29,22 +29,32 @@ BATCH_SIZE_DEFAULT      = 16
 # ---------------------------------------------------------------------  
   
 # --------------------------- LOAD MODELS -----------------------------  
-def load_models(device: str,  
-                compute_type: str,  
-                need_diarization: bool,  
-                need_alignment: bool = True):  
+def load_models(device: str,
+                compute_type: str,
+                need_diarization: bool,
+                need_alignment: bool = True,
+                *,
+                vad_method: str = "pyannote",
+                vad_onset: float = 0.500,
+                vad_offset: float = 0.363,
+                chunk_size: int = 30):
     """Load WhisperX and alignment models once. Diarization stays optional."""  
       
     logging.info("Loading WhisperX model from local cache...")  
     t0 = time.perf_counter()  
-    asr_model = whisperx.load_model(  
-        WHISPER_MODEL_NAME,  
-        device=device,  
-        compute_type=compute_type,  
-        vad_method="silero",  
-        download_root=WHISPER_DOWNLOAD_ROOT,  
-        local_files_only=True  # Force offline usage  
-    )  
+    asr_model = whisperx.load_model(
+        WHISPER_MODEL_NAME,
+        device=device,
+        compute_type=compute_type,
+        vad_method=vad_method,
+        vad_options={
+            "chunk_size": chunk_size,
+            "vad_onset": vad_onset,
+            "vad_offset": vad_offset,
+        },
+        download_root=WHISPER_DOWNLOAD_ROOT,
+        local_files_only=True
+    )
     logging.info("WhisperX ready (%.1fs)", time.perf_counter() - t0)  
   
     # Load alignment model once for reuse  
@@ -87,6 +97,7 @@ def transcribe_file(
     num_spk: Optional[int],  
     min_spk: Optional[int],  
     max_spk: Optional[int],  
+    include_nonspeech_markers: bool
 ) -> Dict[str, float]:  
     """Transcribe (and optionally diarize) a single WAV file."""  
     stats = {  
@@ -103,30 +114,41 @@ def transcribe_file(
   
     # ---------- ASR ----------  
     t0 = time.perf_counter()  
-    result = asr_model.transcribe(  
-        audio,  
-        batch_size=batch_size,  
-        print_progress=True,  
+    result = asr_model.transcribe(    
+        audio,    
+        batch_size=batch_size,    
+        print_progress=True,    
         language="en",  
-    )  
+        include_nonspeech_markers=include_nonspeech_markers,
+        chunk_size=30,  # Add this parameter  
+    )    
     stats["transcribe_s"] = time.perf_counter() - t0  
   
     # ---------- ALIGN (using pre-loaded model) ----------  
-    if result["segments"] and align_model:  
-        logging.info("   aligning …")  
-        t0 = time.perf_counter()  
-        result = whisperx.align(  
-            result["segments"],  
-            align_model,  
-            align_metadata,  
-            audio,  
-            device,  
-        )  
-        stats["align_s"] = time.perf_counter() - t0  
+    if result["segments"] and align_model:
+        logging.info("   aligning …")
+        t0 = time.perf_counter()
+
+        # Pass ALL segments; align() will skip non-speech internally and keep them
+        result = whisperx.align(
+            result["segments"],
+            align_model,
+            align_metadata,
+            audio,
+            device,
+        )
+
+        stats["align_s"] = time.perf_counter() - t0
+
   
-    # ---------- SAVE RAW ----------  
-    raw_text = "\n".join(seg["text"].strip() for seg in result["segments"])  
-    out_raw.write_text(raw_text, encoding="utf-8")  
+    # ---------- SAVE RAW ----------
+    if include_nonspeech_markers:
+        raw_lines = (seg["text"].strip() for seg in result["segments"])
+    else:
+        raw_lines = (seg["text"].strip() for seg in result["segments"]
+                    if seg.get("type") != "non-speech")
+    raw_text = "\n".join(raw_lines)
+    out_raw.write_text(raw_text, encoding="utf-8")
   
     # ---------- DIARIZATION ----------  
     if diar_model and out_diar:  
@@ -141,11 +163,19 @@ def transcribe_file(
         result = assign_word_speakers(diar_segments, result)  
         stats["diarize_s"] = time.perf_counter() - t0  
   
-        diar_text = "\n".join(  
-            f"[{seg.get('speaker', 'UNK')}]: {seg['text'].strip()}"  
-            for seg in result["segments"]  
-        )  
-        out_diar.write_text(diar_text, encoding="utf-8")  
+        # Build diarized text (match CLI style: no prefix for non-speech; avoid [UNK])
+        lines = []
+        last_spk = None
+        for seg in result["segments"]:
+            if seg.get("type") == "non-speech":
+                if include_nonspeech_markers:
+                    lines.append(seg["text"].strip())          # keep [UNTRANSCRIBED]
+                continue                                       # else skip it
+            spk = seg.get("speaker") or last_spk or "SPEAKER_00"
+            last_spk = spk
+            lines.append(f"[{spk}]: {seg['text'].strip()}")
+        diar_text = "\n".join(lines)
+        out_diar.write_text(diar_text, encoding="utf-8")
   
     return stats  
 # ---------------------------------------------------------------------  
@@ -161,6 +191,12 @@ def transcribe_path(
     device: str,  
     compute_type: str,  
     batch_size: int,  
+    *,
+    vad_method: str,
+    vad_onset: float,
+    vad_offset: float,
+    chunk_size: int,
+    include_nonspeech_markers: bool
 ):  
     """Transcribe one file or every *.wav under a directory."""  
     out_raw_dir   = out_root / "raw"  
@@ -170,9 +206,10 @@ def transcribe_path(
         out_diar_dir.mkdir(parents=True, exist_ok=True)  
   
     # Load all models once  
-    asr_model, align_model, align_metadata, diar_model = load_models(  
-        device, compute_type, diarize, need_alignment=True  
-    )  
+    asr_model, align_model, align_metadata, diar_model = load_models(
+        device, compute_type, diarize, need_alignment=True,
+        vad_method=vad_method, vad_onset=vad_onset, vad_offset=vad_offset, chunk_size=chunk_size
+    )
   
     wav_paths = [inp] if inp.is_file() else sorted(inp.glob("*.wav"))  
     if not wav_paths:  
@@ -194,6 +231,7 @@ def transcribe_path(
             num_spk        = num_spk,  
             min_spk        = min_spk,  
             max_spk        = max_spk,  
+            include_nonspeech_markers=include_nonspeech_markers,
         )  
         logging.info(  
             "   audio %.1fs | ASR %.1fs | align %.1fs | diar %.1fs",  
@@ -216,13 +254,41 @@ def main():
                    help="WAV file or directory containing WAVs.")  
     p.add_argument("-o", "--output", default=Path("transcriptions"), type=Path,  
                    help="Output root directory (raw/ & diarized/ subdirs will be created).")  
+
+    p.add_argument(
+        "--vad_method",
+        choices=["pyannote", "silero"],
+        default="silero",
+        help="VAD backend to use (CLI parity: silero is often less choppy)."
+    )
+    p.add_argument("--vad_onset", type=float, default=0.500)
+    p.add_argument("--vad_offset", type=float, default=0.363)
+    p.add_argument("--chunk_size", type=int, default=30)
   
     diar_grp = p.add_mutually_exclusive_group()  
-    diar_grp.add_argument("--diarize", dest="diarize", default=True,  
-                          help="Perform speaker diarization (default).")  
+    diar_grp.add_argument("--diarize", dest="diarize", action="store_true",
+                      help="Perform speaker diarization (default).")
     diar_grp.add_argument("--no-diarize", dest="diarize", action="store_false",  
                           help="Disable speaker diarization.")  
+
     p.set_defaults(diarize=True)  
+
+    # add near your other argparse options
+    ns_grp = p.add_mutually_exclusive_group()
+    ns_grp.add_argument(
+        "--include-nonspeech-markers",
+        dest="include_nonspeech_markers",
+        action="store_true",
+        help="Insert [UNTRANSCRIBED] lines where VAD detects non-speech."
+    )
+    ns_grp.add_argument(
+        "--no-nonspeech-markers",
+        dest="include_nonspeech_markers",
+        action="store_false",
+        help="Omit [UNTRANSCRIBED] lines in outputs (default)."
+    )
+    p.set_defaults(include_nonspeech_markers=False)
+
   
     spk = p.add_argument_group("speaker options (ignored if --no-diarize)")  
     spk.add_argument("--num_speakers",   type=int, default=2,  
@@ -239,17 +305,23 @@ def main():
     args = p.parse_args()  
     logging.basicConfig(level=logging.INFO, format="%(message)s")  
   
-    transcribe_path(  
-        inp         = args.input,  
-        out_root    = args.output,  
-        diarize     = args.diarize,  
-        num_spk     = args.num_speakers,  
-        min_spk     = args.min_speakers,  
-        max_spk     = args.max_speakers,  
-        device      = args.device,  
-        compute_type= args.compute_type,  
-        batch_size  = args.batch_size,  
-    )  
+    transcribe_path(
+        inp=args.input,
+        out_root=args.output,
+        diarize=args.diarize,
+        num_spk=args.num_speakers,
+        min_spk=args.min_speakers,
+        max_spk=args.max_speakers,
+        device=args.device,
+        compute_type=args.compute_type,
+        batch_size=args.batch_size,
+        vad_method=args.vad_method,
+        vad_onset=args.vad_onset,
+        vad_offset=args.vad_offset,
+        chunk_size=args.chunk_size,
+        include_nonspeech_markers=args.include_nonspeech_markers,
+    )
+
   
 if __name__ == "__main__":  
     main()

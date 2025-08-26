@@ -15,9 +15,14 @@ source .venv/bin/activate
 conda deactivate
 ```
 
+### Local Models
+```
+python download_models.py
+```
+
 ### Test
 ```
-whisperx ./wav_audio/3-NewPatient-RadiationOnc-Audio-ChatGPT.wav --vad_method silero
+whisperx ./wav_audio/40-Post-opfollowupforsurgery-onlypatient-SurgicalOnc-Script-Claude.wav --vad_method silero
 ```
 
 ### Ready-to-use Script

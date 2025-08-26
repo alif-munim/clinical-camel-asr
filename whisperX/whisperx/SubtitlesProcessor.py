@@ -73,27 +73,37 @@ class SubtitlesProcessor:
 
 
 
-    def process_segments(self, advanced_splitting=True):
-        subtitles = []
-        for i, segment in enumerate(self.segments):
-            next_segment_start_time = self.segments[i + 1]['start'] if i + 1 < len(self.segments) else None
+    def process_segments(self, advanced_splitting=True, include_nonspeech=False):  
+        subtitles = []  
+        for i, segment in enumerate(self.segments):  
+            # Handle non-speech segments  
+            if segment.get('type') == 'non-speech' and include_nonspeech:  
+                subtitles.append({  
+                    'start': segment['start'],  
+                    'end': segment['end'],  
+                    'text': segment['text']  # e.g., "[SILENCE]"  
+                })  
+                continue  
+                
+            # Existing speech processing logic  
+            next_segment_start_time = self.segments[i + 1]['start'] if i + 1 < len(self.segments) else None  
             
-            if advanced_splitting:
-
-                split_points = self.determine_advanced_split_points(segment, next_segment_start_time)
-                subtitles.extend(self.generate_subtitles_from_split_points(segment, split_points, next_segment_start_time))
-            else:
-                words = segment['words']
-                for i, word in enumerate(words):
-                    if 'start' not in word or 'end' not in word:
-                        self.estimate_timestamp_for_word(words, i, next_segment_start_time)
-
-                subtitles.append({
-                'start': segment['start'],
-                'end': segment['end'],
-                'text': segment['text']
-            })
-
+            if advanced_splitting:  
+                split_points = self.determine_advanced_split_points(segment, next_segment_start_time)  
+                subtitles.extend(self.generate_subtitles_from_split_points(segment, split_points, next_segment_start_time))  
+            else:  
+                # Existing simple processing  
+                words = segment['words']  
+                for i, word in enumerate(words):  
+                    if 'start' not in word or 'end' not in word:  
+                        self.estimate_timestamp_for_word(words, i, next_segment_start_time)  
+    
+                subtitles.append({  
+                    'start': segment['start'],  
+                    'end': segment['end'],  
+                    'text': segment['text']  
+                })  
+    
         return subtitles
 
     def determine_advanced_split_points(self, segment, next_segment_start_time=None):

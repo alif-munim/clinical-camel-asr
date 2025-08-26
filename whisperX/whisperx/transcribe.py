@@ -150,6 +150,7 @@ def transcribe_task(args: dict, parser: argparse.ArgumentParser):
             chunk_size=chunk_size,
             print_progress=print_progress,
             verbose=verbose,
+            include_nonspeech_markers=True  # New parameter  
         )
         results.append((result, audio_path))
 

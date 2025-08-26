@@ -197,22 +197,26 @@ class FasterWhisperPipeline(Pipeline):
         print_progress=False,
         combined_progress=False,
         verbose=False,
+        include_nonspeech_markers=False,  # New parameter  
     ) -> TranscriptionResult:
         if isinstance(audio, str):
             audio = load_audio(audio)
 
-        def data(audio, segments):
-            for seg in segments:
-                f1 = int(seg['start'] * SAMPLE_RATE)
-                f2 = int(seg['end'] * SAMPLE_RATE)
-                # print(f2-f1)
-                yield {'inputs': audio[f1:f2]}
+        def data(audio, segments):  
+            for seg in segments:  
+                # Only yield speech segments for ASR processing  
+                if seg.get('type', 'speech') == 'speech':  
+                    f1 = int(seg['start'] * SAMPLE_RATE)  
+                    f2 = int(seg['end'] * SAMPLE_RATE)  
+                    yield {'inputs': audio[f1:f2]}
 
         # Pre-process audio and merge chunks as defined by the respective VAD child class 
         # In case vad_model is manually assigned (see 'load_model') follow the functionality of pyannote toolkit
+        # Pre-process audio and merge chunks as defined by the respective VAD child class   
+        # In case vad_model is manually assigned (see 'load_model') follow the functionality of pyannote toolkit  
         if issubclass(type(self.vad_model), Vad):
             waveform = self.vad_model.preprocess_audio(audio)
-            merge_chunks =  self.vad_model.merge_chunks
+            merge_chunks = self.vad_model.merge_chunks   # <-- always use the class’s merge
         else:
             waveform = Pyannote.preprocess_audio(audio)
             merge_chunks = Pyannote.merge_chunks
@@ -224,6 +228,10 @@ class FasterWhisperPipeline(Pipeline):
             onset=self._vad_params["vad_onset"],
             offset=self._vad_params["vad_offset"],
         )
+
+        print(f"######## PRINTING vad_segments ########")
+        print(vad_segments)
+
         if self.tokenizer is None:
             language = language or self.detect_language(audio)
             task = task or "transcribe"
@@ -254,33 +262,58 @@ class FasterWhisperPipeline(Pipeline):
 
         segments: List[SingleSegment] = []
         batch_size = batch_size or self._batch_size
-        total_segments = len(vad_segments)
-        for idx, out in enumerate(self.__call__(data(audio, vad_segments), batch_size=batch_size, num_workers=num_workers)):
-            if print_progress:
-                base_progress = ((idx + 1) / total_segments) * 100
-                percent_complete = base_progress / 2 if combined_progress else base_progress
-                print(f"Progress: {percent_complete:.2f}%...")
-            text = out['text']
-            if batch_size in [0, 1, None]:
-                text = text[0]
-            if verbose:
-                print(f"Transcript: [{round(vad_segments[idx]['start'], 3)} --> {round(vad_segments[idx]['end'], 3)}] {text}")
-            segments.append(
-                {
-                    "text": text,
-                    "start": round(vad_segments[idx]['start'], 3),
-                    "end": round(vad_segments[idx]['end'], 3)
-                }
-            )
 
-        # revert the tokenizer if multilingual inference is enabled
-        if self.preset_language is None:
-            self.tokenizer = None
+        # Separate speech and non-speech segments for processing  
+        speech_segments = [seg for seg in vad_segments if seg.get('type', 'speech') == 'speech']  
+        total_segments = len(speech_segments)  
 
-        # revert suppressed tokens if suppress_numerals is enabled
-        if self.suppress_numerals:
-            self.options = replace(self.options, suppress_tokens=previous_suppress_tokens)
-
+        # Process only speech segments through ASR  
+        asr_results = []  
+        for idx, out in enumerate(self.__call__(data(audio, speech_segments), batch_size=batch_size, num_workers=num_workers)):  
+            if print_progress:  
+                base_progress = ((idx + 1) / total_segments) * 100  
+                percent_complete = base_progress / 2 if combined_progress else base_progress  
+                print(f"Progress: {percent_complete:.2f}%...")  
+            text = out['text']  
+            print(f"######## PRINTING text during reconstruction ########")
+            print(text)
+            if batch_size in [0, 1, None]:  
+                text = text[0]  
+            asr_results.append(text)  
+  
+        # Reconstruct timeline with both speech and non-speech segments  
+        speech_idx = 0  
+        for seg in vad_segments:  
+            if seg.get('type') == 'non-speech' and include_nonspeech_markers:  
+                # Add non-speech marker  
+                segments.append({  
+                    "text": "[UNTRANSCRIBED]",  
+                    "start": round(seg['start'], 3),  
+                    "end": round(seg['end'], 3),  
+                    "type": "non-speech"  
+                })  
+            else:  
+                # Add speech segment with transcription  
+                if speech_idx < len(asr_results):  
+                    text = asr_results[speech_idx]  
+                    if verbose:  
+                        print(f"Transcript: [{round(seg['start'], 3)} --> {round(seg['end'], 3)}] {text}")  
+                    segments.append({  
+                        "text": text,  
+                        "start": round(seg['start'], 3),  
+                        "end": round(seg['end'], 3),  
+                        "type": "speech"  
+                    })  
+                    speech_idx += 1  
+    
+        # revert the tokenizer if multilingual inference is enabled  
+        if self.preset_language is None:  
+            self.tokenizer = None  
+    
+        # revert suppressed tokens if suppress_numerals is enabled  
+        if self.suppress_numerals:  
+            self.options = replace(self.options, suppress_tokens=previous_suppress_tokens)  
+    
         return {"segments": segments, "language": language}
 
     def detect_language(self, audio: np.ndarray) -> str:

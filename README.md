@@ -20,6 +20,11 @@ cd <your-home-dir>/promptimizer
 pip install -e .
 ```
 
+Use existing environment
+```
+conda activate promptim_v2
+```
+
 Copy an existing prompt optimization task and create your own.
 ```
 cp prompt_optimization/pp-v2 prompt_optimization/<new-task>
@@ -34,6 +39,30 @@ Take note of your input and output fields when uploading your CSV. These will ne
 Once everything is ready, start training.
 ```
 promptim train --task ./<your-task>/config.json
+```
+
+## Data Generation
+```
+python data_generation/json_to_transcript.py
+```
+
+```
+python data_generation/generate_prompts.py --csv-path data_generation/new8.csv
+```
+
+## Evals
+```
+python evals/evaluate_ner.py /home/bowang/Documents/alif/clinical-camel-asr/data/whisper_0725.csv /home/bowang/Documents/alif/clinical-camel-asr/data/uhn19_gliner_v2.csv --ner_model gliner
+
+python evals/evaluate_ner.py /home/bowang/Documents/alif/clinical-camel-asr/data/whisper_0725.csv /home/bowang/Documents/alif/clinical-camel-asr/data/uhn19_ompharma.csv --ner_model openmed-pharma
+
+python evals/evaluate_ner.py /home/bowang/Documents/alif/clinical-camel-asr/data/whisper_0725.csv /home/bowang/Documents/alif/clinical-camel-asr/data/uhn19_ompatho.csv --ner_model openmed-pathology
+
+python evals/evaluate_ner.py /home/bowang/Documents/alif/clinical-camel-asr/data/whisper_0725.csv /home/bowang/Documents/alif/clinical-camel-asr/data/uhn19_omana.csv --ner_model openmed-anatomy
+
+python evals/evaluate_ner.py /home/bowang/Documents/alif/clinical-camel-asr/data/whisper_0725.csv /home/bowang/Documents/alif/clinical-camel-asr/data/uhn19_omgen.csv --ner_model openmed-genomics
+
+python evals/evaluate_ner.py /home/bowang/Documents/alif/clinical-camel-asr/data/whisper_0725.csv /home/bowang/Documents/alif/clinical-camel-asr/data/uhn19_omonc.csv --ner_model openmed-oncology
 ```
 
 

@@ -1,0 +1,30 @@
+{
+  "name": "pp-v1-mixed-providers",
+  "dataset": "https://smith.langchain.com/public/5081cf42-4fcf-4401-8489-83b74f9165e7/d",
+  "description": "Optimize a prompt for Llama 3.1 using GPT-4o-mini as the optimizer.",
+  "algorithm": {
+      "batch_size": 1,
+      "epochs": 10,
+      "debug": false
+  },
+  "initial_prompt": {
+      "prompt_str": "You are an expert medical transcription editor tasked with cleaning a raw ASR transcript.\n\nYour goal is to produce a 100% accurate and professionally formatted final version.\n\nInstructions:\n1. Correct all ASR errors, including spelling, grammar, and punctuation.\n2. Ensure all medical terminology and drug names are accurate.\n3. Format the text into clear paragraphs for readability, following standard transcription conventions.\n4. Provide ONLY the final, corrected transcript as your output. Do not include any notes, analysis, or commentary.\n\nRAW TRANSCRIPT:\n{input}",
+      "model_config": {
+        "model": "meta-llama/llama-3.3-70b-instruct",
+        "model_provider": "openrouter",
+        "base_url": "https://openrouter.ai/api/v1"
+      }
+  },
+  "optimizer": {
+    "model": {
+      "model": "gpt-4.1-mini",
+      "model_provider": "openai"
+    }
+  },
+  "evaluators": "./task.py:evaluators",
+  "evaluator_descriptions": {
+    "wer_evaluator": "Measures Word Error Rate. Lower WER is better.",
+    "think_tags_evaluator": "Ensures that the model first analyzes the raw transcript in <think> tags."
+  },
+  "$schema": "https://raw.githubusercontent.com/hinthornw/promptimizer/refs/heads/main/config-schema.json"
+}

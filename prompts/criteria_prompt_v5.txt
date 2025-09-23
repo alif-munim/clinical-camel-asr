@@ -1,0 +1,68 @@
+Your primary task is to generate a comprehensive and clinically realistic oncology scenario. This involves two parts: a detailed medical transcript and a structured JSON clinical summary that is meticulously derived from it.
+
+The core principle is that the transcript must be a believable, in-depth human conversation, and the JSON must be a high-quality, clinically accurate SOAP note a doctor would write after that conversation.
+
+🔍 Key Criteria
+Category: {category}
+
+Goal: {goal}
+
+📝 Generation Instructions
+Follow this strict two-step process:
+
+1. Transcript Generation (The Human Interaction First)
+
+First, write a detailed and realistic medical transcript of an oncology encounter.
+
+Detailed and Longer Dialogue: Generate a comprehensive, extended conversation that thoroughly covers all important aspects, including patient concerns, clinical reasoning, and treatment recommendations. The dialogue should be substantial enough to reflect the length and depth of real-world clinical consultations.
+
+Natural Dialogue: The conversation must feel authentic. Use realistic speech patterns, hesitations, and emotional responses. The structure of the conversation should vary naturally.
+
+Organic Detail: Clinical details (patient age, diagnosis, symptoms, history) must emerge organically through the conversation, not as a checklist.
+
+Show, Don't Just Tell: The dialogue should reveal the doctor's clinical reasoning process as they ask questions, interpret the patient's answers, and explain their thoughts.
+
+2. JSON Summary Generation (The Clinical SOAP Note Second)
+
+After writing the transcript, analyze the dialogue you created and derive a structured JSON summary from it. The JSON must be a high-fidelity SOAP note and adhere strictly to the following clinical documentation standards:
+
+chief_complaint:
+
+Content: A single sentence or phrase in the patient's own words that describes the main reason for the visit. It can be a symptom, condition, or a previous diagnosis. If multiple complaints are mentioned, identify the most compelling problem to serve as the "title" for the encounter. Examples: "This terrible headache and blurry vision that won't go away," "Feeling completely drained and losing weight for no reason," "This persistent cough and trouble breathing at night," "chest pain, decreased appetite, and shortness of breath."
+
+history_of_present_illness:
+
+Content: A detailed clinical narrative describing the patient's condition since their last visit. It should be in clinical terms and may be in a narrative or bulleted format. It should include the evolution of symptoms (using OLDCARTS framework if applicable), diagnosis details (type, stage, mutations), treatment status, response to treatment, and any toxicities or changes.
+
+Length: Aim for 1 detailed paragraph (50-175 words) for an existing patient or 1-3 paragraphs (150-350 words) for a new patient.
+
+impression:
+
+Content: A clinical assessment of the patient's current condition and disease status in clinical terms, often in a bulleted format. This should include updated diagnoses with stage/biomarkers, interpretation of labs/imaging/symptoms, and outputs of assessments (e.g., ECOG score).
+
+Length: Typically 2-15 bullet points, depending on the complexity of the visit.
+
+plan:
+
+Content: A short description in clinical terms of what is being done to manage each problem from the impression. This should include the treatment plan, supportive care, follow-up/referrals, and any patient education or shared decision-making that occurred.
+
+Length: Typically 1-2 bullets per issue, for a total of 5-15 lines. This can be more detailed if a treatment is changing.
+
+📌 Final Output Format
+Present your final output in this exact order, with the Transcript: appearing before the JSON Summary:.
+
+Transcript:
+Doctor: ...
+Patient: ...
+Caregiver: ... (if applicable)
+
+JSON Summary:
+
+{
+  "chief_complaint": "...",
+  "history_of_present_illness": "...",
+  "impression": "...",
+  "plan": [
+    "..."
+  ]
+}

@@ -1,0 +1,56 @@
+Your primary task is to generate diverse and clinically accurate oncology scenarios. For each scenario, you will create a structured JSON summary first, and then a corresponding medical dialogue. The main focus is to ensure the scenario is a creative and realistic application of the provided Goal and Category.
+
+🔍 Key Criteria
+Category: {category}
+
+Goal: {goal}
+
+📝 Generation Instructions
+Follow this two-step process:
+
+1. JSON Summary Generation (Generate This First)
+
+Create a JSON object using the exact four-key format below. The content must be a direct reflection of the clinical scenario and the Key Criteria.
+
+chief_complaint: The patient's primary concern written in the patient's own words (e.g., "I've been feeling so tired," "This pain in my side won't go away").
+
+history_of_present_illness: A clinical summary of the patient's story and symptoms, written in professional medical language.
+
+impression: A concise clinical assessment of the situation, written in professional medical language.
+
+plan: A list of next steps or actions, written in professional medical language. This can be "N/A" if no specific plan is formulated during the encounter.
+
+Example JSON Structure:
+
+{
+  "chief_complaint": "Hard time breathing again at night.",
+  "history_of_present_illness": "The patient reports doing better overall with less coughing, but experienced a recurrence of difficulty breathing last night that was severe enough to wake them up. This episode of breathing difficulty has not occurred in the past few weeks.",
+  "impression": "The patient presents with a recent episode of nocturnal dyspnea after a period of improvement in cough symptoms.",
+  "plan": [
+    "Monitor for further episodes of nocturnal dyspnea.",
+    "Consider chest X-ray if symptoms persist or worsen."
+  ]
+}
+
+2. Transcript Generation (Generate This Second)
+
+After creating the JSON, write a realistic and concise medical transcript. This dialogue should naturally lead to the clinical data captured in the JSON you just created.
+
+Speaker Tags: Clearly label dialogue using only "Doctor:", "Patient:", and "Caregiver:" (when applicable).
+
+Natural Conversation: The dialogue should be believable and reflect natural human speech patterns (e.g., hesitations, clarifications, emotional responses).
+
+Concise Length: The transcript does not need to be long or overly detailed. Focus on capturing the core exchange that fulfills the Goal.
+
+📌 Final Output Format
+Present your final output in this exact order and format, with the JSON Summary: appearing before the Transcript:.
+
+JSON Summary:
+{
+  "chief_complaint": "...",
+  "history_of_present_illness": "...",
+  "impression": "...",
+  "plan": [
+    "..."
+  ]
+}

@@ -1,0 +1,72 @@
+Your primary task is to generate a clinically accurate oncology scenario in two parts: a structured JSON summary and a medical transcript. The two parts must be in perfect alignment. The transcript must be a direct, complete dramatization of all information contained within the JSON.
+
+🔍 Key Criteria
+Category: {category}
+
+Goal: {goal}
+
+📝 Generation Instructions
+Follow this strict two-step process:
+
+
+1. JSON Summary Generation (Source of Truth)
+
+First, create a comprehensive JSON object that serves as the factual basis for the entire scenario. This JSON must adhere to the following detailed SOAP note structure and content guidelines:
+
+
+chief_complaint:
+
+Content: The patient's primary concern in their own words (layperson language).
+
+Format: A single, concise sentence or phrase.
+
+
+history_of_present_illness:
+
+Content: A detailed narrative of the patient's condition written in professional clinical terms. Must include all relevant context: patient age, specific diagnosis (e.g., type, stage), treatment history, and a description of how symptoms have evolved.
+
+Format: A detailed clinical paragraph (50-175 words).
+
+
+impression:
+
+Content: A clinical assessment of the patient's condition, disease status, and interpretation of symptoms, written in professional clinical terms.
+
+Format: Can be a short paragraph or bullet points.
+
+
+plan:
+
+Content: The specific actions to be taken, including treatments, supportive care, referrals, and patient education. Written in professional clinical terms.
+
+Format: A list of bulleted action items.
+
+
+2. Transcript Generation (Dramatization of JSON)
+
+Second, write a realistic medical transcript that is a direct verbalization of the JSON summary. This is the most critical rule: every single detail from the JSON must be explicitly mentioned, discussed, or referenced in the dialogue.
+
+100% Fidelity: If the JSON mentions the patient is 45, the dialogue must confirm their age. If the HPI notes a diagnosis from 8 months ago, that timeframe must be stated in the conversation. If the plan includes a specific medication, the doctor must discuss it with the patient.
+
+Natural Dialogue: While ensuring completeness, the dialogue should still flow naturally. Use realistic speech patterns and speaker tags ("Doctor:", "Patient:", "Caregiver:").
+
+
+Example of Fidelity:
+
+JSON detail: "history_of_present_illness": "45-year-old patient with metastatic breast cancer..."
+
+Required in Transcript: Doctor: "Okay Sarah, I'm reviewing your chart. You're 45, and we've been managing the metastatic breast cancer..."
+
+
+📌 Final Output Format
+Present your final output in this exact order and format, with the JSON Summary: appearing before the Transcript:.
+
+JSON Summary:
+{
+  "chief_complaint": "...",
+  "history_of_present_illness": "...",
+  "impression": "...",
+  "plan": [
+    "..."
+  ]
+}

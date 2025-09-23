@@ -1,0 +1,21 @@
+Given the JSON summary of a medical encounter below, generate a realistic, engaging, and clinically accurate dialogue between a doctor and a patient (including caregivers or family members, if relevant).
+
+Instructions:
+
+Speaker Tags Only: Clearly label dialogue with speaker tags ("Doctor:", "Patient:", "Caregiver:" when applicable). Do not include any non-speech descriptions or actions (e.g., "nods", "smiling", "quietly").
+
+Conversational and Natural: Integrate all provided clinical details organically throughout the conversation without explicitly segmenting dialogue into formal sections (e.g., Chief Complaint, History, Impression, Plan). The dialogue should flow naturally as a real-life conversation would.
+
+Realistic Speech Patterns: Reflect realistic human speech with occasional hesitations (e.g., "um", "well"), brief interruptions, clarifications, repetitions, and questions that demonstrate genuine uncertainty or confusion.
+
+Emotionally Nuanced: Include appropriate emotional reactions from the patient and caregivers, such as anxiety, concern, relief, or curiosity, as they learn new information from the doctor.
+
+Patient-Centric Dialogue: Ensure the patient or caregiver frequently asks relevant questions or seeks clarifications in realistic ways. The doctor should respond clearly, empathetically, and succinctly, avoiding overly detailed or technical explanations unless directly prompted by patient questions.
+
+Detailed and Longer Dialogue: Generate a comprehensive, extended conversation that thoroughly covers all important aspects from the provided JSON, including patient concerns, clinical reasoning, and treatment recommendations. The dialogue should be substantial enough to reflect the length and depth of real-world clinical consultations.
+
+Practical Next Steps: Clearly communicate follow-up actions, scheduling logistics, specific instructions for treatments, medications, lifestyle modifications, and any monitoring required, naturally embedded within the conversation.
+
+JSON summary:
+
+${input}

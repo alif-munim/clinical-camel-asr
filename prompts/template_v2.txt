@@ -1,0 +1,163 @@
+Medical Oncology Consultation Prompt: [INTERACTION_TYPE] Visit with [PROVIDER_TYPE] for [CANCER_TYPE]
+
+Create a realistic dialogue between a [PROVIDER_TYPE] and a patient during a [INTERACTION_TYPE] visit for [CANCER_TYPE]. The conversation should capture the clinical assessment, treatment discussions, and patient concerns typical for this type of oncology consultation, while maintaining authentic human interaction during this approximately [VISIT_LENGTH]-minute visit. When medications are mentioned, include both brand names and generic/molecular names.
+
+The patient should ask a lot of simple questions about the treatment and recovery. The patient should use poor grammar, mispronounce or misstate their medications, and have a relative education level of 9th grade (US).
+
+Core Elements to Include
+Introduction and context setting
+
+Establish the purpose of the [INTERACTION_TYPE] visit
+
+Include appropriate review of relevant history based on visit type
+
+Introduce any team members present (nurse, resident, etc.)
+
+Set expectations for the discussion's focus based on visit type
+
+Assessment and findings review
+
+Include clear explanation of any diagnostic results, treatment outcomes, or current status
+
+Discuss specific aspects relevant to [CANCER_TYPE] in this visit context
+
+Explain the implications of current findings for treatment planning
+
+Address the patient's understanding of their current disease status
+
+Treatment discussion
+
+Present appropriate treatment options or modifications based on visit type
+
+Explain the rationale behind recommendations specific to [CANCER_TYPE]
+
+Discuss expected benefits and potential side effects of proposed approaches
+
+Include explanation of how the specific treatment plan is personalized
+
+Symptom management and supportive care
+
+Include detailed review of current symptoms and their management
+
+Discuss strategies for improving comfort and function
+
+Explain which symptoms are expected versus concerning
+
+Address the impact of symptoms on quality of life
+
+Practical considerations and logistics
+
+Include discussion of treatment schedule and coordination if applicable
+
+Explain any preparation requirements or precautions
+
+Discuss coordination with other aspects of care
+
+Address practical questions about daily living during treatment
+
+Psychosocial aspects
+
+Show discussion of emotional impact appropriate to visit context
+
+Include conversation about coping strategies and support
+
+Address concerns specific to [CANCER_TYPE] and treatment phase
+
+Include information about relevant support resources
+
+Next steps and planning
+
+Include clear outline of immediate next steps
+
+Show discussion of follow-up timelines and monitoring
+
+Address the decision-making process going forward
+
+Include information about when and how to contact the healthcare team
+
+Dialogue Enhancement Elements
+Natural communication of medical information
+
+Include moments where complex concepts are translated into understandable terms
+
+Show the provider checking frequently for understanding
+
+Include instances where medical terminology is explained in plain language
+
+Demonstrate how information is presented in manageable portions
+
+Emotional aspects relevant to visit type
+
+Include acknowledgment of emotions appropriate to visit context
+
+Show discussion of common psychological responses in this treatment phase
+
+Include addressing specific concerns related to [CANCER_TYPE]
+
+Demonstrate appropriate provider responses to patient emotions
+
+Shared decision-making approach
+
+Include explanation of evidence-based recommendations versus preference-sensitive decisions
+
+Show provider eliciting patient's values and priorities
+
+Include discussion of how patient preferences influence recommendations
+
+Demonstrate collaborative approach to care planning
+
+Non-verbal communication elements
+
+Include descriptions of visual aids or physical demonstrations when applicable
+
+Show the provider's attentiveness to the patient's comfort and cues
+
+Include reference to appropriate physical examination if relevant
+
+Reference supportive body language during sensitive discussions
+
+Character Aspects to Consider
+Provider ([PROVIDER_TYPE]):
+
+Approach to explaining options relevant to [CANCER_TYPE]
+
+Communication style regarding benefits and risks
+
+Experience in addressing concerns typical in this visit context
+
+Methods for supporting appropriate decision-making
+
+Nursing Staff/Team Members:
+
+Role in providing additional support and education
+
+Expertise in practical aspects of care
+
+Approach to addressing psychosocial concerns
+
+Continuity of care between visits
+
+Patient:
+
+Previous experience with cancer care based on visit type
+
+Knowledge level about their condition
+
+Specific concerns related to [CANCER_TYPE] and current phase
+
+Decision-making style and information preferences
+
+Relative education level: 9th grade (US)
+
+Speech: poor grammar, mispronounces or misstates medications
+
+Support Person(s):
+
+Role in the care and decision-making process
+
+Questions or concerns about caregiving needs
+
+Understanding of the recommendations
+
+Emotional response to the current situation
+

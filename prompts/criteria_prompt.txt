@@ -1,0 +1,86 @@
+Given the structured information from the table row below, generate:
+
+A realistic, engaging, and clinically accurate transcript of a medical encounter (dialogue between doctor, patient, and caregiver if relevant).
+
+A corresponding structured JSON summary that concisely captures key clinical points from the encounter.
+
+🔍 Table Information
+
+Objective: ${objective}
+
+Category: ${category}
+
+Goal: ${goal}
+
+Example: ${example}
+
+📝 Generation Instructions
+
+Transcript Generation
+
+Speaker Tags: Clearly label dialogue using only "Doctor:", "Patient:", and "Caregiver:" (when applicable). Avoid non-speech actions (e.g., "nods", "quietly").
+
+Natural Conversation: Dialogue should organically include all provided clinical details without explicitly dividing sections (e.g., Subjective, Objective, Assessment, Plan).
+
+Realistic Speech Patterns: Incorporate natural human speech characteristics such as hesitations ("um", "well"), repetitions, clarifications, and questions reflecting genuine patient uncertainty or concern.
+
+Patient-Centric Dialogue: Ensure frequent, realistic patient or caregiver inquiries or clarifications. Doctor responses should be clear, empathetic, and concise, using clinical terminology only if explained clearly in lay terms upon patient request.
+
+Emotionally Nuanced: Include realistic emotional reactions (anxiety, relief, curiosity) as new clinical information or instructions are communicated.
+
+Comprehensive Length: The dialogue must be detailed, covering the clinical situation thoroughly, reflecting realistic length and complexity of actual medical consultations.
+
+Practical Next Steps: Clearly communicate necessary follow-up actions, specific instructions, treatment plans, medications (including normalized medication references when applicable), lifestyle recommendations, and required monitoring, embedded naturally in the conversation.
+
+JSON Summary Generation
+
+Produce a structured JSON summary that concisely captures:
+
+Chief Complaint: Patient's primary concern translated into medically precise language.
+
+Symptoms: Structured representation of symptoms with descriptors (onset, duration, severity).
+
+SOAP Classification: Assignment of information into Subjective, Objective, Assessment, Plan categories, consistent with clinical documentation standards.
+
+Red Flags: Identification and explicit labeling of urgent or emergent symptoms.
+
+Medication: Standardized representation of medications mentioned, normalizing brand names or informal mentions into structured clinical format.
+
+Clinical Ambiguities: Clearly note any uncertainties or ambiguities acknowledged during the encounter.
+
+Follow-Up Actions: Clear documentation of recommended next steps, including appointments, monitoring, or referrals.
+
+📌 Output Format
+
+Transcript:
+
+Doctor:Patient:Caregiver:...
+
+JSON Summary:
+{
+  "Chief Complaint": "...",
+  "Symptoms": [
+    {
+      "Symptom": "...",
+      "Onset": "...",
+      "Duration": "...",
+      "Severity": "..."
+    }
+  ],
+  "SOAP Classification": {
+    "Subjective": "...",
+    "Objective": "...",
+    "Assessment": "...",
+    "Plan": "..."
+  },
+  "Red Flags": ["..."],
+  "Medication": [
+    {
+      "Name": "...",
+      "Dosage": "...",
+      "Frequency": "..."
+    }
+  ],
+  "Clinical Ambiguities": ["..."],
+  "Follow-Up Actions": ["..."]
+}

@@ -1,0 +1,51 @@
+Your primary task is to generate a clinically accurate and realistic oncology scenario. This involves two parts: a natural, flowing medical transcript, and a structured JSON clinical summary that is derived from it.
+
+The core principle is that the transcript should be a believable human conversation, and the JSON should be the structured clinical note a doctor would write after having that conversation.
+
+🔍 Key Criteria
+Category: {category}
+
+Goal: {goal}
+
+📝 Generation Instructions
+Follow this two-step process:
+
+1. Transcript Generation (The Human Interaction First)
+
+First, write a realistic medical transcript that brings a clinical scenario to life. Your main goal here is naturalism and plausibility.
+
+Natural Dialogue: The conversation should feel real. Use realistic speech patterns, hesitations, and emotional responses. The structure of the conversation should vary.
+
+Show, Don't Just Tell: Allow the clinical details (like patient age, diagnosis, symptoms) to emerge organically through the conversation, rather than being stated like a checklist.
+
+Focus on Clinical Reasoning: The dialogue should reveal how the doctor arrives at their assessment and plan by showing them asking questions, listening, and explaining their thought process to the patient.
+
+2. JSON Summary Generation (The Clinical Foundation Second)
+
+After writing the transcript, analyze the dialogue you created and derive a structured JSON summary from it. The JSON must accurately reflect all the key clinical data from the conversation.
+
+chief_complaint: The patient's concern in their own, natural words, as stated in the transcript.
+
+history_of_present_illness: A detailed clinical narrative summarizing the facts from the dialogue (patient details, diagnosis, symptom evolution, etc.).
+
+impression: The clinician's assessment, based on their reasoning in the transcript.
+
+plan: The specific, actionable next steps that were discussed in the transcript.
+
+📌 Final Output Format
+Present your final output in this exact order, with the Transcript: appearing before the JSON Summary:.
+
+Transcript:
+Doctor: ...
+Patient: ...
+Caregiver: ... (if applicable)
+
+JSON Summary:
+{
+  "chief_complaint": "...",
+  "history_of_present_illness": "...",
+  "impression": "...",
+  "plan": [
+    "..."
+  ]
+}

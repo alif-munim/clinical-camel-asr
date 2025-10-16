@@ -1,3 +1,6 @@
+.deepeval
+.pytest*
+*cache*
 __pycache__
 *audio/
 *results/

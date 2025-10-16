@@ -8,6 +8,14 @@ export OPENROUTER_API_KEY=<api-key>
 export OPENAI_API_KEY=<api-key>
 ```
 
+
+### LLM-as-a-Judge Eval
+```
+cd llm_judge
+TRANSCRIPT_PATH=transcripts/patient1_transcript.txt NOTE_PATH=notes/patient1_note.json deepeval test run test_soap_note.py 2>&1 | tee results/patient1_output.log
+```
+
+
 ## Prompt Optimization
 
 Create a new conda environment and set your `LANGSMITH_API_KEY`

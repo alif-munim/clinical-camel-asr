@@ -1,0 +1,31 @@
+{
+    "Chief Complaint": [
+    "I’m mostly here to understand where things stand and what the plan is."
+    ],
+    "History of Present Illness": [
+    "Ms. Banner presents with a history of small cell lung cancer with hepatic metastases and a prior base-of-tongue squamous cell carcinoma now in remission. She reports fatigue that is manageable with intermittent assistance, but denies new fevers, chills, weight change, or worsening swallowing difficulties. She has no new chest pain, palpitations, or edema, and her cough and occasional shortness of breath are described as typical for her baseline. She reports no nausea, vomiting, diarrhea, constipation, abdominal pain, urinary symptoms, rash, or new thyroid symptoms. She continues to experience back and shoulder pain at baseline levels, and denies new numbness or tingling. She is currently on thyroid replacement, antihypertensive medication, anticoagulation for a prior leg clot, denosumab for bone involvement, and as-needed anti-nausea and pain medications. Recent laboratory data show fluctuating blood counts with anemia monitored, a transient low sodium that improved, and variable liver chemistries consistent with hepatic disease. Tumor markers noted a normal CEA and a negative Signatera test. Imaging history includes initial post-therapy scans showing improvement, recent CT/MRI scans demonstrating recurrence in the right upper lung and liver with progression after maintenance immunotherapy, and initiation of lurbinectedin. She continues to smoke, reports a readiness score of 5 for quitting, and has agreed to skip one cigarette in the afternoon with a water substitute. She reports adequate hydration and nutrition, and is able to perform basic self-care with intermittent assistance when fatigued."
+    ],
+    "Impression": [
+    "Small cell lung cancer with hepatic metastases, currently progressing after maintenance immunotherapy, now on lurbinectedin.",
+    "Bone metastases managed with denosumab; no new skeletal events reported.",
+    "Anticoagulation for prior leg clot continued; no new thrombotic events.",
+    "Thyroid hormone replacement and antihypertensive therapy stable; no new endocrine or cardiovascular symptoms.",
+    "Fatigue is manageable; no new fevers, chills, weight loss, or significant GI or urinary symptoms.",
+    "Imaging shows disease progression in lung and liver; no new CNS lesions.",
+    "Labs: blood counts fluctuating with anemia monitored; sodium low once but improved; liver enzymes variable with hepatic disease.",
+    "Smoking status unchanged; patient has agreed to a modest cessation plan."
+    ],
+    "Plan": [
+    "Continue lurbinectedin chemotherapy per oncology schedule.",
+    "Maintain denosumab for bone health; monitor for skeletal events.",
+    "Continue anticoagulation therapy; monitor for bleeding or clotting complications.",
+    "Continue thyroid hormone replacement and antihypertensive medication; monitor labs as indicated.",
+    "Continue as-needed anti-nausea and pain medications; adjust based on pain control and side effects.",
+    "Schedule routine laboratory work (CBC, electrolytes, liver function) at each treatment cycle.",
+    "Schedule imaging (CT chest/abdomen) per oncology protocol to assess disease status.",
+    "Encourage smoking cessation: skip one cigarette in the afternoon, replace with water, involve daughter for reminders.",
+    "Advise patient to call clinic promptly if new or worsening symptoms (e.g., breathing difficulty, uncontrolled pain, sudden decline).",
+    "Continue routine follow-up visits; adjust plan based on patient’s functional status and goals."
+    ]
+    }
+    

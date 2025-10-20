@@ -1,0 +1,26 @@
+{
+    "Chief_Complaint": [
+      "I have noticed that the area near my forearm has become slightly tender and appears a bit larger than before."
+    ],
+    "History_of_Present_Illness": [
+      "Mrs. Thompson presents with a forearm lesion that she reports has become slightly tender and larger than before. She reports fatigue and a slight decrease in appetite, which she attributes to aging. She has a history of hypertension and arthritis and is taking medications for those conditions, which have been reviewed by the pharmacist and found to have no significant contraindication to the planned biopsy. She is anxious about the lesion and has expressed concern about a possible malignancy. The physician suspects squamous cell carcinoma and has recommended a biopsy to confirm the diagnosis. Following the discussion of biopsy risks and consent, the pharmacist, Mr. Lee, joined the consultation to review Mrs. Thompson’s medication list. No contraindications were identified with the planned biopsy or potential future therapies. The patient expressed understanding and reassurance, agreeing to proceed with the biopsy and subsequent evaluation\" The patient has provided informed consent for the procedure. Post-biopsy, imaging such as a CT scan may be performed to assess for spread if malignancy is confirmed. The patient is expected to resume normal activities after a brief recovery period. "
+    ],
+    "Impression": [
+      "Possible squamous cell carcinoma of forearm lesion pending biopsy.",
+      "Patient anxiety about lesion.",
+      "Fatigue and decreased appetite possibly related to aging or malignancy.",
+      "No contraindication to biopsy identified.",
+      "Imaging may be required if biopsy confirms malignancy."
+    ],
+    "Plan": [
+      "Perform biopsy of the forearm lesion.",
+      "Obtain informed consent for the biopsy.",
+      "Review medication list with pharmacist to ensure no drug interactions.",
+      "Schedule imaging (CT scan) if biopsy confirms malignancy.",
+      "Provide post-procedure care instructions.",
+      "Schedule follow-up appointment after biopsy results to discuss treatment plan.",
+      "Discuss potential treatment options (surgery, radiation, systemic therapy) based on stage.",
+      "Offer supportive care options for any systemic treatment side effects."
+    ]
+  }
+  

@@ -1,0 +1,24 @@
+{
+    "Chief_Complaint": [
+    "I'm feeling a bit tired and uneasy recently."
+    ],
+    "History_of_Present_Illness": [
+    "Mr. Thompson reports progressive fatigue and persistent nausea that began approximately three weeks ago, with symptoms worsening despite antiemetic use. He denies other new symptoms. Laboratory evaluation shows elevated liver enzymes and a mild decrease in white blood cell counts, consistent with systemic chemotherapy toxicity. Imaging demonstrates stable disease with no evidence of tumor\n\nprogression. The patient is receiving a chemotherapy regimen for nasopharyngeal cancer, and cumulative toxicity is suspected as the primary contributor to his fatigue and nausea. The oncology team has discussed reducing the chemotherapy dose, switching to a less toxic regimen, or incorporating supportive care measures, and has recommended a new biopsy to obtain updated histopathological and molecular information to guide potential treatment modifications."
+    ],
+    "Impression": [
+    "Stable disease on imaging; likely chemotherapy-induced toxicity.",
+    "Cumulative toxicity contributing to progressive fatigue and persistent nausea.",
+    "Laboratory findings of elevated liver enzymes and mild leukopenia support systemic toxicity.",
+    "Biopsy recommended to assess tumor biology and guide potential treatment modification."
+    ],
+    "Plan": [
+    "Schedule a minimally invasive biopsy within the next few days pending final consent.",
+    "Adjust supportive care measures, including antiemetics and nutritional support, to manage fatigue and nausea.",
+    "Reduce current chemotherapy dosage and monitor liver and kidney function closely.",
+    "Consider switching to a less toxic chemotherapy agent or initiating targeted therapy if biopsy reveals actionable genetic changes.",
+    "Provide pre-procedure instructions, including medication adjustments (e.g., hold certain drugs if necessary).",
+    "Refer to a nutritionist and physical therapy specialist for tailored dietary and exercise recommendations.",
+    "Schedule a follow-up appointment after biopsy results to review findings and update the treatment plan."
+    ]
+    }
+    

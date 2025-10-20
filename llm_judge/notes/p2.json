@@ -1,0 +1,36 @@
+{
+    "Chief Complaint": [
+      "Neuropathy in hands and feet"
+    ],
+    "History of Present Illness": [
+      "Mr. Goodman reports ongoing peripheral neuropathy characterized by numbness in the feet, difficulty standing or walking for extended periods, and occasional unsteady gait, with the hands less affected but still symptomatic when inactive. He denies recent changes in neuropathy severity. He experiences frequent diarrhea, particularly after meals and in the mornings, with occasional streaks of blood attributed to hemorrhoids; Imodium provides relief. He reports no current mouth sores, but notes a drug-related rash that flares on the chest and neck, causing itching; antihistamines and moisturizers are used. He experiences daily nausea, especially in the mornings on an empty stomach, with Zofran providing some benefit; no vomiting has occurred. He reports mild, intermittent left-sided abdominal pain that worsens after large meals. Respiratory status has improved; he no longer requires daytime oxygen, uses inhalers daily, and experiences shortness of breath only with exertion. Laboratory values are stable, with electrolytes, blood counts, and liver enzymes within normal limits except for transient elevations; ferritin remains elevated due to hereditary hemochromatosis. Tumor markers show a slow upward trend in CEA, but the patient is reassured that this is not definitive for recurrence. ctDNA tests (Signatera, Garden Reveal) have fluctuated, and imaging with PET scans shows stable small pulmonary nodules and omental implants. He is on Eliquis for thromboprophylaxis, experiences easy bruising, and has no new bleeding events. He reports no chest pain or cough, and no recent chest infections."
+    ],
+    "Impression": [
+      "Stable disease on PET imaging with small pulmonary nodules and omental implants unchanged.",
+      "Peripheral neuropathy persists, predominantly in feet, with numbness and gait instability.",
+      "Chronic diarrhea post-ileostomy reversal, responsive to Imodium, with occasional hemorrhoid-related bleeding.",
+      "Drug-related rash on chest and neck, managed with antihistamines and moisturizers.",
+      "Daily nausea, especially morning, controlled with Zofran; no vomiting.",
+      "Mild intermittent left-sided abdominal pain, worsened by large meals.",
+      "Respiratory status improved; daytime oxygen discontinued, inhalers used daily, shortness of breath on exertion.",
+      "Labs stable; ferritin elevated due to hereditary hemochromatosis; CEA trending upward but not definitive; ctDNA fluctuating.",
+      "No new chest pain, cough, or chest infections; easy bruising on Eliquis, no significant bleeding.",
+      "Patient remains motivated to reduce smoking; supportive strategies discussed."
+    ],
+    "Plan": [
+      "Continue PET scans every few months to monitor disease stability.",
+      "Monitor CEA, ferritin, and ctDNA levels at each visit.",
+      "Continue Imodium for diarrhea; add electrolyte drinks or broths during episodes.",
+      "Take Zofran before meals to pre-empt morning nausea.",
+      "Apply sunscreen, wear protective clothing, and use antihistamine at night for rash.",
+      "Perform daily foot checks for neuropathy; wear supportive shoes and pace activities.",
+      "Maintain inhaler regimen; consider pulmonary rehab if shortness of breath persists.",
+      "Continue Eliquis; monitor for bruising and bleeding; report any new bleeding.",
+      "Discuss smoking cessation options: nicotine patch, varenicline, or bupropion; set incremental reduction goal.",
+      "Encourage keeping a symptom log for abdominal pain and bowel habits.",
+      "Consider phlebotomy for hereditary hemochromatosis after completion of chemotherapy.",
+      "Encourage participation in support group if desired; maintain weight and nutrition.",
+      "Bring written list of questions to each visit; call office promptly if red-flag symptoms appear."
+    ]
+  }
+  

@@ -1,0 +1,183 @@
+Provider: Good morning, Ms. Banner. It’s good to see you. Your main diagnoses on file are small cell lung cancer with spread to the liver, and a prior base-of-tongue cancer that has been in remission by recent exams and scans. Today I’d like to review how you’re feeling, touch on your treatments and medications, go over what the notes say about labs and imaging, and confirm next steps. Anything you’d like to add to that agenda?
+
+Patient: That sounds right. I’m mostly here to understand where things stand and what the plan is.
+
+Provider: Thank you. Before we dive in, how is your energy and day-to-day function this week compared with the last visit?
+
+Patient: A bit tired but manageable. I’m moving around with help when I’m worn out.
+
+Provider: Understood. Let’s briefly review the cancer history as your chart summarizes it, then we’ll talk about today. Your base-of-tongue cancer was treated with chemoradiation and has repeatedly been described as in remission by exam and scans. For the small cell lung cancer, you had carboplatin and etoposide with a good response, chest radiation afterward, and later a period of observation. More recently, there was a recurrence noted in the right upper lung area and in the liver, and you’ve been treated with chemotherapy again, immunotherapy maintenance, and, when the disease progressed on scans, you started lurbinectedin. Does that match what you recall?
+
+Patient: Yes, that tracks with what my doctors told me.
+
+Provider: Good. I also see mentions of bone involvement being managed with denosumab, and at one point you were on anticoagulation for a blood clot in the leg. Are you still taking the blood thinner?
+
+Patient: Yes, I’m on it as prescribed.
+
+Provider: Thank you. Now, quick check on daily meds: thyroid replacement is on your list, as well as blood pressure medication and supportive medicines for nausea and pain. Any changes since the last visit?
+
+Patient: No changes. I’m still on the thyroid pill, the blood pressure pill, and the nausea and pain meds as needed.
+
+Provider: Got it. Let me do a short, targeted symptom check so we don’t miss anything important. I’ll keep this concise.
+
+Patient: Okay.
+
+Provider: Any fevers, chills, notable weight change, or unusual fatigue beyond your baseline?
+
+Patient: No fevers or chills. Fatigue comes and goes, but nothing out of the ordinary for me.
+
+Provider: Any mouth sores or trouble with swallowing beyond what’s already known from your prior treatments?
+
+Patient: Swallowing has been a challenge at times in the past, but lately it’s about the same—nothing new.
+
+Provider: Chest pain or palpitations? Any new or worsening ankle swelling?
+
+Patient: No chest pain or palpitations. Swelling is not new and hasn’t changed.
+
+Provider: Cough, wheeze, or shortness of breath different from your usual?
+
+Patient: Some cough and occasional shortness of breath, but that’s been typical for me. No big change this week.
+
+Provider: Nausea, vomiting, diarrhea, constipation, or abdominal pain?
+
+Patient: No nausea or vomiting. Bowel movements are okay, maybe a little slower sometimes, but manageable. No new abdominal pain.
+
+Provider: Any burning with urination or blood in the urine?
+
+Patient: No.
+
+Provider: Joint pains or back pain beyond your baseline?
+
+Patient: My back and shoulder can hurt, but that’s been there. It’s not worse than usual this week.
+
+Provider: Headaches, dizziness, or new numbness or tingling?
+
+Patient: Dizziness has happened before, but nothing new. No new numbness or tingling.
+
+Provider: Any rashes, itching, or skin changes you’re worried about?
+
+Patient: I’ve had some skin issues in the past, but nothing new right now.
+
+Provider: Hot or cold intolerance beyond your usual thyroid pattern? Any changes in sleep or mood that you want to flag?
+
+Patient: No major changes.
+
+Provider: Thank you. That helps. Now, on labs: I will summarize based on what’s in your notes. There are entries describing blood counts that have ranged from low to within acceptable ranges at different times during treatment, with anemia mentioned and monitored. Electrolytes have included low sodium at one point related to your condition, which improved with the measures you
+
+were given. Liver tests have varied with the liver involvement and treatment. When those have been called out, the team has ordered follow-up checks. Does that reflect what you were told?
+
+Patient: Yes, they’ve been keeping an eye on those, and I was told the sodium improved after it dropped.
+
+Provider: Good. On tumor markers, I will only note what is explicitly mentioned: a past note recorded that CEA was normal at the time it was checked, and a Signatera test returned negative on that occasion. We’ll stick to exactly that wording and not extend beyond it. Sound okay?
+
+Patient: That’s fine.
+
+Provider: Regarding imaging, your records include several CT scans and MRIs over time. Earlier sets after initial therapy showed improvement or no new disease. More recent scans described areas in the right upper lung and liver consistent with recurrence or progression, and your care team adjusted treatment accordingly. There were times when the degree of change compared with prior scans wasn’t specified in the report, and the oncologist documented attempts to clarify with radiology. That’s the level of detail I can state based on the notes. Any questions on that?
+
+Patient: No, that makes sense. I remember they were waiting on calls back sometimes.
+
+Provider: On treatments: you received carboplatin and etoposide, chest radiation afterward, later maintenance immunotherapy, and then lurbinectedin when the scans indicated progression. There is also documentation of planning or discussion around further therapy options versus supportive care during certain points, with decisions aligned to how you were feeling at those times. I’ll stay with that summary since it matches the chart.
+
+Patient: Okay.
+
+Provider: Supportive medications: anti-nausea therapy has been used around treatments; pain medicines have been adjusted depending on how you’re doing; and there were visits focusing on fatigue and anemia support as needed. You’ve also been counseled about smoking cessation multiple times in the notes. How are you feeling about smoking right now?
+
+Patient: I’m still smoking. I know I shouldn’t. Cutting back has been hard.
+
+Provider: Thank you for being honest. On a 0–10 scale, where 0 is “not ready at all” and 10 is “ready to quit now,” where do you feel you are today?
+
+Patient: Maybe a 5.
+
+Provider: A 5 shows there is some readiness. What makes it a 5 and not a 2?
+
+Patient: I know it’s not helping any of this, and my family keeps encouraging me.
+
+Provider: Those are strong reasons. On a confidence scale, 0–10, how confident do you feel that you could try one small change this week—such as delaying or skipping a set time cigarette each day?
+
+Patient: Maybe a 6.
+
+Provider: Great. What would help move it to a 7?
+
+Patient: Having a simple plan and a reminder from my daughter would help.
+
+Provider: Excellent. If it’s okay with you, we can choose one small, doable step: pick one cigarette you’ll skip each day this week and replace that moment with a brief walk or a glass of water. Would that be reasonable?
+
+Patient: I can try skipping one in the afternoon and go for water instead.
+
+Provider: Perfect. We’ll check in on how that goes at the next visit. If you want more help sooner, let the team know and they can support you further.
+
+Patient: Okay.
+
+Provider: Let me offer brief education that aligns with the treatments listed in your chart. With chemotherapy and the agents you’ve received, common experiences include fatigue, changes in blood counts, and occasional GI upset. Your notes show that anti-nausea medications and rest breaks have been used, and blood counts have been monitored with plans adjusted accordingly. For immunotherapy, some patients can have inflammation-type side effects; the notes indicate that your team monitored and responded to symptoms when they arose. For bone-targeted therapy, dental care and attention to overall bone
+
+health have been emphasized at times. For you, the plan has been to monitor labs and symptoms and to adjust treatment based on response and tolerance. That’s the level of detail I’ll provide to stay strictly within the record.
+
+Patient: Thanks. That all sounds familiar.
+
+Provider: Outside the cancer treatments, your chart also mentions thyroid replacement, blood pressure management, and a prior blood clot treated with anticoagulation. How are you doing with the thyroid pill routine?
+
+Patient: I’m taking it as prescribed.
+
+Provider: Any lightheadedness, chest discomfort, or new breathing trouble that is different from your baseline?
+
+Patient: No new changes this week.
+
+Provider: Good. Regarding pain, a few notes mention back and shoulder pain that varied over time and required adjustments in pain medicine. How is your pain today?
+
+Patient: It’s there, but the medication helps keep it tolerable.
+
+Provider: I’m glad it’s controlled enough to function. Let’s keep the current approach, since your team has been balancing pain relief with side effects.
+
+Patient: Okay.
+
+Provider: Let me summarize what the chart shows on recent disease assessments and plans, keeping the language general. Earlier, there was a period where scans and exam suggested remission. Later, there were scans noting recurrent disease in the chest and liver, and treatment was updated. Subsequent scans described progression after maintenance immunotherapy, and the plan moved to lurbinectedin. When there were changes in how you felt, your team discussed options ranging from additional therapy to supportive care, with decisions guided by your goals. Does that capture it accurately?
+
+Patient: Yes, that’s how it was explained to me.
+
+Provider: Good. For labs, we’ll keep to qualitative descriptors: blood counts have fluctuated with treatment; anemia has been monitored; liver and other chemistries have varied in the context of liver involvement and therapy; sodium was low at one point
+
+and improved with the measures used. The plan in multiple notes is to continue checking labs at defined intervals around treatment decisions. Any questions about that?
+
+Patient: No, I understand.
+
+Provider: On imaging ahead, your chart documents periodic restaging scans and that future imaging or appointments would be scheduled based on the most recent assessments. If new or worsening symptoms arise between visits, the instruction has been to contact the team rather than waiting. Does that align with what you were told?
+
+Patient: Yes, they said to call if anything changes.
+
+Provider: Great. I also see your prior head imaging without evidence of metastatic disease at the times checked, and that any decisions about brain-directed measures were to be made in coordination with those results and your tolerance. We’ll keep that wording as documented.
+
+Patient: Okay.
+
+Provider: Let’s talk briefly about day-to-day function. Are you able to manage meals, hygiene, and short walks most days, or do you need more assistance lately?
+
+Patient: I can do the basics, but when I’m wiped out I need help to get up or move around for a while.
+
+Provider: Thank you. That’s consistent with prior notes describing good days and harder days. For hydration and nutrition, your records emphasize focusing on fluids and sufficient calories, with adjustments when swallowing was challenging. Are you able to maintain your intake right now?
+
+Patient: Yes, I’m doing okay with that.
+
+Provider: Excellent. If that changes, please let the team know promptly.
+
+Patient: I will.
+
+Provider: A couple of clarifying points from the record. There were times when scan comparisons didn’t list exact differences, and your oncologist documented attempts to confirm with the interpreting radiologist. If any lingering discrepancies remain, the plan is to reconcile those in the chart while sticking with the treatment course discussed with you. That approach remains sound.
+
+Patient: Good to know.
+
+Provider: Before we close, is there anything about side effects you want to review—nausea strategies, bowel routine, sleep, or mood?
+
+Patient: No, I think I’m okay for now.
+
+Provider: All right. Two brief reminders that are consistent with your charted care: contact the team if you notice new or worsening symptoms compared with your baseline, and keep the scheduled labs and imaging as arranged. If appointments need to be adjusted because of how you’re feeling, call so the plan can be tailored.
+
+Patient: Okay.
+
+Provider: Would you be willing to do a quick teach-back so I can be sure I explained everything clearly? In your own words, what are the main steps after today?
+
+Patient: Keep taking my medicines as prescribed, including the thyroid pill and the blood thinner. Stay with the current cancer plan the team discussed, and do the labs and scans they schedule. If I notice new or worsening symptoms, call instead of waiting. For smoking, try skipping one cigarette in the afternoon and have water instead, and ask my daughter to remind me.
+
+Provider: That’s an excellent summary. I’ll add just one clarification based on the records: where prior scans or reports had comparison gaps, the plan has been to reconcile those details in the chart without changing today’s plan, and to continue follow-up on the schedule your team set. Otherwise, what you said is exactly right. We’ll keep monitoring symptoms, labs, and imaging as documented, and we’ll continue to align treatment decisions with how you’re doing and your goals.
+
+Patient: Thank you. That helps.
+
+Provider: You’re welcome, Ms. Banner. If anything changes before your next visit—new or worsening breathing symptoms, pain that isn’t controlled with your current medicines, or any sudden decline—please call the clinic promptly. We’re here to support you. Take care.

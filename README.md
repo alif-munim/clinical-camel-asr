@@ -10,9 +10,55 @@ export OPENAI_API_KEY=<api-key>
 
 
 ### LLM-as-a-Judge Eval
+
 ```
+conda activate clinical_camel
 cd llm_judge
-TRANSCRIPT_PATH=transcripts/patient1_transcript.txt NOTE_PATH=notes/patient1_note.json deepeval test run test_soap_note.py 2>&1 | tee results/patient1_output.log
+
+TABLE=1 \
+CSV=results/test.csv \
+TRANSCRIPT_PATH=tensorr_1113/output1/output_1_transcript.json \
+NOTE_PATH=tensorr_1113/output1/output_1_tensorr_note.json \
+REF_NOTE_PATH=tensorr_1113/output1/output_1_progress_note.json \
+deepeval test run test_soap_note.py 2>&1 | tee results/tensorr_1113_model/output1.log
+
+TABLE=1 \
+CSV=results/test.csv \
+TRANSCRIPT_PATH=tensorr_1113/output2/output_2_transcript.json \
+NOTE_PATH=tensorr_1113/output2/output_2_tensorr_note.json \
+REF_NOTE_PATH=tensorr_1113/output2/output_2_progress_note.json \
+deepeval test run test_soap_note.py 2>&1 | tee results/tensorr_1113_model/output2.log
+
+TABLE=1 \
+CSV=results/test.csv \
+TRANSCRIPT_PATH=tensorr_1113/output3/output_3_transcript.json \
+NOTE_PATH=tensorr_1113/output3/output_3_tensorr_note.json \
+REF_NOTE_PATH=tensorr_1113/output3/output_3_progress_note.json \
+deepeval test run test_soap_note.py 2>&1 | tee results/tensorr_1113_model/output3.log
+
+TABLE=1 \
+CSV=results/test.csv \
+TRANSCRIPT_PATH=tensorr_1113/output4/output_4_transcript.json \
+NOTE_PATH=tensorr_1113/output4/output_4_tensorr_note.json \
+REF_NOTE_PATH=tensorr_1113/output4/output_4_progress_note.json \
+deepeval test run test_soap_note.py 2>&1 | tee results/tensorr_1113_model/output4.log
+
+TABLE=1 \
+CSV=results/test.csv \
+TRANSCRIPT_PATH=tensorr_1113/output5/output_5_transcript.json \
+NOTE_PATH=tensorr_1113/output5/output_5_tensorr_note.json \
+REF_NOTE_PATH=tensorr_1113/output5/output_5_progress_note.json \
+deepeval test run test_soap_note.py 2>&1 | tee results/tensorr_1113_model/output5.log
+```
+
+```
+conda activate clinical_camel
+cd llm_judge
+TABLE=1 TRANSCRIPT_PATH=transcripts/p1.txt NOTE_PATH=notes/p1.json deepeval test run test_soap_note.py 2>&1 | tee results/p1_output_v2.log
+TABLE=1 TRANSCRIPT_PATH=transcripts/p2.txt NOTE_PATH=notes/p2.json deepeval test run test_soap_note.py 2>&1 | tee results/p2_output.log
+TABLE=1 TRANSCRIPT_PATH=transcripts/p3.txt NOTE_PATH=notes/p3.json deepeval test run test_soap_note.py 2>&1 | tee results/p3_output.log
+TABLE=1 TRANSCRIPT_PATH=transcripts/p4.txt NOTE_PATH=notes/p4.json deepeval test run test_soap_note.py 2>&1 | tee results/p4_output.log
+TABLE=1 TRANSCRIPT_PATH=transcripts/p5.txt NOTE_PATH=notes/p5.json deepeval test run test_soap_note.py 2>&1 | tee results/p5_output.log
 ```
 
 

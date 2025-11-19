@@ -2,6 +2,7 @@
 import os
 import re
 import json
+import csv
 import atexit
 import pytest
 from typing import List, Tuple, Dict, Any
@@ -12,9 +13,11 @@ from deepeval.metrics import GEval
 
 # ===================== Config =====================
 TRANSCRIPT_PATH = os.getenv("TRANSCRIPT_PATH", "transcripts/patient1_transcript.txt")
-NOTE_PATH       = os.getenv("NOTE_PATH",       "notes/patient1_note.json")
+NOTE_PATH       = os.getenv("NOTE_PATH",       "notes/patient1_note.json")        # model-generated note
+REF_NOTE_PATH   = os.getenv("REF_NOTE_PATH")                                     # reference note (e.g., progress note)
 TABLE_OUTPUT    = os.getenv("TABLE", "0") == "1"        # set TABLE=1 to print a rich table at the end
 TABLE_WIDTH     = int(os.getenv("TABLE_WIDTH", "120"))  # width hint for table wrapping
+CSV_PATH        = os.getenv("CSV")                      # set CSV=/path/to/file.csv to enable CSV output
 
 # ===================== Helpers =====================
 def _norm_key(s: str) -> str:
@@ -76,13 +79,20 @@ def eval_with_reason(metric: GEval, test_case: LLMTestCase) -> Tuple[float, bool
         return score, success, reason
 
 # ===================== Load data =====================
-with open(TRANSCRIPT_PATH, "r") as f:
+with open(TRANSCRIPT_PATH, "r", encoding="utf-8") as f:
     transcript = f.read()
 
-with open(NOTE_PATH, "r") as f:
+with open(NOTE_PATH, "r", encoding="utf-8") as f:
     note_content = f.read()
 
-sections = parse_json_soap_note(note_content)
+sections = parse_json_soap_note(note_content)  # model note sections
+
+# Optional reference note (e.g., progress note)
+ref_sections: Dict[str, str] = {}
+if REF_NOTE_PATH:
+    with open(REF_NOTE_PATH, "r", encoding="utf-8") as f:
+        ref_note_content = f.read()
+    ref_sections = parse_json_soap_note(ref_note_content)
 
 # ===================== Build tests =====================
 test_data: List[Tuple[str, int, LLMTestCase, GEval]] = []
@@ -104,8 +114,71 @@ _RESULTS: List[Dict[str, Any]] = []
 def _register_result(row: Dict[str, Any]) -> None:
     _RESULTS.append(row)
 
+def _write_csv_row() -> None:
+    """
+    Append a single row to the CSV specified by CSV env var.
+
+    Column order:
+      transcript,
+      CC_ref, CC_model, CC_score, CC_reason,
+      HPI_ref, HPI_model, HPI_score, HPI_reason,
+      Impression_ref, Impression_model, Impression_score, Impression_reason,
+      Plan_ref, Plan_model, Plan_score, Plan_reason
+    """
+    if not CSV_PATH or not _RESULTS:
+        return
+
+    # Map: section -> (score, reason)
+    by_section: Dict[str, Dict[str, Any]] = {}
+    for r in _RESULTS:
+        sec = r.get("Section")
+        if not sec:
+            continue
+        by_section[sec] = {
+            "score": r.get("Score"),
+            "reason": r.get("Reason", "") or "",
+        }
+
+    sections_order = ["CC", "HPI", "Impression", "Plan"]
+
+    fieldnames = ["transcript"]
+    for sec in sections_order:
+        fieldnames.extend([
+            f"{sec}_ref",
+            f"{sec}_model",
+            f"{sec}_score",
+            f"{sec}_reason",
+        ])
+
+    row: Dict[str, Any] = {}
+
+    # Full transcript
+    row["transcript"] = transcript
+
+    # Reference + model text + scores/reasons
+    for sec in sections_order:
+        data = by_section.get(sec, {})
+        row[f"{sec}_ref"]    = ref_sections.get(sec, "")
+        row[f"{sec}_model"]  = sections.get(sec, "")
+        row[f"{sec}_score"]  = data.get("score", "")
+        row[f"{sec}_reason"] = data.get("reason", "")
+
+    file_exists = os.path.isfile(CSV_PATH)
+    os.makedirs(os.path.dirname(CSV_PATH) or ".", exist_ok=True)
+    with open(CSV_PATH, "a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(row)
+
 def _print_summary_table() -> None:
-    if not TABLE_OUTPUT or not _RESULTS:
+    if not _RESULTS:
+        return
+
+    # First, write CSV row (if requested)
+    _write_csv_row()
+
+    if not TABLE_OUTPUT:
         return
 
     # Compute overall pass rate
@@ -174,10 +247,11 @@ def test_soap_section(section_name, case_idx, test_case, metric):
     if reason:
         print(f"{section_name} Reason: {reason}")
 
-    # Register for table
+    # Register for table / CSV
     test_case_label = f"test_soap_section[{section_name}-test_case{case_idx}-{metric.name}]"
     _register_result({
         "Test case": test_case_label,
+        "Section": section_name,
         "Metric": metric.name,
         "Score": score,
         "Threshold": getattr(metric, "threshold", 0.0),
